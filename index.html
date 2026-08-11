@@ -1,0 +1,1183 @@
+<title>Get AI Powers · RevOps Command Center (Prototype v3)</title>
+<style>
+  :root{
+    --paper:#F7F5F1; --surface:#FFFFFF; --surface-2:#F1EDE6; --surface-3:#ECE7DE;
+    --ink:#23211B; --muted:#6B665B; --faint:#9A9486; --line:#E5E0D7; --line-2:#D9D3C8;
+    --accent:#B4701A; --accent-ink:#8A560F; --accent-soft:#F6E9D6; --accent-line:#E9D3AE;
+    --teal:#2E736B; --teal-soft:#DCEBE8;
+    --good:#3C8A57; --good-soft:#E0EEE3; --warn:#B5811F; --bad:#BB4A34; --bad-soft:#F3E1DB;
+    --violet:#6C4CB0; --violet-soft:#E7E1F3; --plum:#994C8E; --plum-soft:#EADDE9; --blue:#2C5A99; --blue-soft:#DCE7F3;
+    --shadow:0 1px 2px rgba(35,33,27,.04), 0 4px 16px rgba(35,33,27,.05);
+    --shadow-lg:0 12px 44px rgba(35,33,27,.18);
+    --font-sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --font-mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,monospace;
+    --r:14px;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --paper:#151410; --surface:#1E1C16; --surface-2:#26241C; --surface-3:#2E2B21;
+    --ink:#F1EDE3; --muted:#A39D8F; --faint:#6E6858; --line:#302D24; --line-2:#3C382D;
+    --accent:#E7A44A; --accent-ink:#F0BE78; --accent-soft:#332817; --accent-line:#4A3A1E;
+    --teal:#57A79C; --teal-soft:#1D2F2C; --good:#5EA878; --good-soft:#1C2C21; --warn:#D4A245; --bad:#D9765F; --bad-soft:#33201B;
+    --violet:#B29BE6; --violet-soft:#2A2340; --plum:#D79BC9; --plum-soft:#331F30; --blue:#7FA8DB; --blue-soft:#1B2838;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.3); --shadow-lg:0 12px 44px rgba(0,0,0,.6);
+  }}
+  :root[data-theme="dark"]{
+    --paper:#151410; --surface:#1E1C16; --surface-2:#26241C; --surface-3:#2E2B21;
+    --ink:#F1EDE3; --muted:#A39D8F; --faint:#6E6858; --line:#302D24; --line-2:#3C382D;
+    --accent:#E7A44A; --accent-ink:#F0BE78; --accent-soft:#332817; --accent-line:#4A3A1E;
+    --teal:#57A79C; --teal-soft:#1D2F2C; --good:#5EA878; --good-soft:#1C2C21; --warn:#D4A245; --bad:#D9765F; --bad-soft:#33201B;
+    --violet:#B29BE6; --violet-soft:#2A2340; --plum:#D79BC9; --plum-soft:#331F30; --blue:#7FA8DB; --blue-soft:#1B2838;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.3); --shadow-lg:0 12px 44px rgba(0,0,0,.6);
+  }
+  :root[data-theme="light"]{
+    --paper:#F7F5F1; --surface:#FFFFFF; --surface-2:#F1EDE6; --surface-3:#ECE7DE;
+    --ink:#23211B; --muted:#6B665B; --faint:#9A9486; --line:#E5E0D7; --line-2:#D9D3C8;
+    --accent:#B4701A; --accent-ink:#8A560F; --accent-soft:#F6E9D6; --accent-line:#E9D3AE;
+    --teal:#2E736B; --teal-soft:#DCEBE8; --good:#3C8A57; --good-soft:#E0EEE3; --warn:#B5811F; --bad:#BB4A34; --bad-soft:#F3E1DB;
+    --violet:#6C4CB0; --violet-soft:#E7E1F3; --plum:#994C8E; --plum-soft:#EADDE9; --blue:#2C5A99; --blue-soft:#DCE7F3;
+    --shadow:0 1px 2px rgba(35,33,27,.04), 0 4px 16px rgba(35,33,27,.05); --shadow-lg:0 12px 44px rgba(35,33,27,.18);
+  }
+
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{font-family:var(--font-sans); background:var(--paper); color:var(--ink); -webkit-font-smoothing:antialiased; line-height:1.45; font-size:14px}
+  .tnum{font-family:var(--font-mono); font-variant-numeric:tabular-nums; letter-spacing:-.01em}
+  .eyebrow{font-size:11px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; color:var(--faint)}
+  h1,h2,h3{margin:0; text-wrap:balance; font-weight:640; letter-spacing:-.015em}
+  button{font-family:inherit; cursor:pointer}
+
+  .app{display:grid; grid-template-columns:238px 1fr; min-height:100vh}
+  .sidebar{background:var(--surface); border-right:1px solid var(--line); display:flex; flex-direction:column; gap:2px; padding:16px 14px; position:sticky; top:0; height:100vh; overflow-y:auto}
+  .brand{display:flex; align-items:center; gap:10px; padding:6px 8px 12px}
+  .brand .mark{width:30px; height:30px; border-radius:8px; flex:none; background:linear-gradient(150deg,var(--accent),var(--accent-ink)); color:#fff; display:grid; place-items:center; font-weight:800; font-size:17px; box-shadow:0 2px 8px rgba(180,112,26,.35)}
+  .brand b{font-size:14px; font-weight:680; display:block; line-height:1.15}
+  .brand span{font-size:11px; color:var(--faint)}
+  .navsec{font-size:10px; font-weight:700; letter-spacing:.11em; text-transform:uppercase; color:var(--faint); padding:12px 8px 4px}
+  .navlink{display:flex; align-items:center; gap:11px; padding:7px 10px; border-radius:9px; color:var(--muted); font-weight:520; font-size:13.5px; border:0; background:none; width:100%; text-align:left; transition:background .12s, color .12s}
+  .navlink:hover{background:var(--surface-2); color:var(--ink)}
+  .navlink.active{background:var(--accent-soft); color:var(--accent-ink); font-weight:600}
+  .navlink .ic{width:17px; height:17px; flex:none; opacity:.9}
+  .navlink .cnt{margin-left:auto; font-size:11px; color:var(--faint); font-family:var(--font-mono)}
+  .side-foot{margin-top:auto; padding:10px 8px 2px; border-top:1px solid var(--line); display:flex; align-items:center; gap:9px}
+  .avatar{width:26px;height:26px;border-radius:50%; background:var(--teal); color:#fff; display:grid;place-items:center; font-size:11px; font-weight:700; flex:none}
+  .side-foot small{display:block; color:var(--faint); font-size:11px}
+
+  .main{min-width:0; display:flex; flex-direction:column}
+  .topbar{display:flex; align-items:center; gap:14px; padding:14px 28px; border-bottom:1px solid var(--line); background:color-mix(in srgb, var(--paper) 82%, transparent); backdrop-filter:blur(8px); position:sticky; top:0; z-index:30}
+  .topbar .crumb{font-size:12px; color:var(--faint)} .topbar h1{font-size:18px} .spacer{flex:1}
+  .btn{display:inline-flex; align-items:center; gap:7px; border:1px solid var(--line-2); background:var(--surface); color:var(--ink); padding:8px 13px; border-radius:9px; font-size:13px; font-weight:560; transition:.12s}
+  .btn:hover{background:var(--surface-2)}
+  .btn.primary{background:linear-gradient(160deg,var(--accent),var(--accent-ink)); color:#fff; border-color:transparent; box-shadow:0 2px 10px rgba(180,112,26,.28)}
+  .btn.primary:hover{filter:brightness(1.05)}
+  .btn.ai{border-color:var(--accent-line); color:var(--accent-ink); background:var(--accent-soft)}
+  .btn.sm{padding:6px 10px; font-size:12px; border-radius:8px}
+  .iconbtn{width:34px;height:34px; border-radius:9px; border:1px solid var(--line-2); background:var(--surface); display:grid; place-items:center; color:var(--muted)}
+  .iconbtn:hover{background:var(--surface-2); color:var(--ink)}
+
+  .view{padding:24px 28px 70px; display:none} .view.active{display:block; animation:fade .22s ease}
+  .view.wide{max-width:none} .view:not(.wide){max-width:none}
+  .detail{max-width:1180px} .view#view-deal, .view#view-prospect{max-width:1180px}
+  @keyframes fade{from{opacity:0; transform:translateY(4px)}to{opacity:1; transform:none}}
+  @media (prefers-reduced-motion:reduce){.view.active{animation:none}}
+
+  .sectionhead{display:flex; align-items:baseline; gap:12px; margin:28px 0 14px} .sectionhead:first-child{margin-top:4px}
+  .sectionhead h2{font-size:15px} .sectionhead .note{font-size:12px; color:var(--faint)} .sectionhead .line{flex:1; height:1px; background:var(--line)}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow)}
+
+  .seg{display:inline-flex; background:var(--surface-2); border:1px solid var(--line); border-radius:9px; padding:3px; gap:2px}
+  .seg button{border:0; background:none; color:var(--muted); font-size:12.5px; font-weight:560; padding:5px 12px; border-radius:7px}
+  .seg button.on{background:var(--surface); color:var(--ink); box-shadow:var(--shadow)}
+
+  .kpigrid{display:grid; gap:14px} .g5{grid-template-columns:repeat(5,1fr)} .g4{grid-template-columns:repeat(4,1fr)} .g3{grid-template-columns:repeat(3,1fr)} .g2{grid-template-columns:repeat(2,1fr)}
+  .kpi{padding:16px 17px; position:relative; overflow:hidden}
+  .kpi .lab{display:flex; align-items:center; gap:7px; font-size:12px; color:var(--muted); font-weight:520}
+  .kpi .val{font-size:26px; font-weight:680; margin-top:9px; letter-spacing:-.02em} .kpi .val small{font-size:14px; color:var(--faint); font-weight:600}
+  .kpi .delta{display:inline-flex; align-items:center; gap:3px; font-size:11.5px; font-weight:640; margin-top:8px; font-family:var(--font-mono)}
+  .up{color:var(--good)} .down{color:var(--bad)} .kpi .foot{font-size:11px; color:var(--faint); margin-top:3px}
+  .kpi.hero{background:linear-gradient(165deg, color-mix(in srgb,var(--accent-soft) 70%, var(--surface)), var(--surface)); border-color:var(--accent-line)}
+  .tag-lead{background:var(--teal-soft); color:var(--teal); font-size:9.5px; font-weight:700; letter-spacing:.06em; padding:2px 6px; border-radius:5px; text-transform:uppercase}
+  .tag-lag{background:var(--accent-soft); color:var(--accent-ink); font-size:9.5px; font-weight:700; letter-spacing:.06em; padding:2px 6px; border-radius:5px; text-transform:uppercase}
+
+  .funnel{padding:20px; display:flex; flex-direction:column; gap:11px}
+  .frow{display:grid; grid-template-columns:150px 1fr 84px; align-items:center; gap:14px}
+  .frow .fl{font-size:13px; font-weight:560} .frow .fl small{display:block; color:var(--faint); font-size:11px; font-weight:500}
+  .fbar{height:34px; border-radius:8px; background:var(--surface-2); overflow:hidden; position:relative}
+  .fbar>span{display:block; height:100%; background:linear-gradient(90deg,var(--accent),var(--accent-ink)); border-radius:8px}
+  .fbar em{position:absolute; left:12px; top:0; height:100%; display:flex; align-items:center; color:#fff; font-style:normal; font-weight:640; font-size:12.5px; font-family:var(--font-mono)}
+  .fconv{font-family:var(--font-mono); font-size:12.5px; color:var(--muted); text-align:right} .fconv b{color:var(--good)}
+
+  .planner{padding:20px} .planner label{font-size:12px; color:var(--muted); font-weight:560}
+  .rangewrap{display:flex; align-items:center; gap:14px; margin-top:12px} .rangewrap input[type=range]{flex:1; accent-color:var(--accent)}
+  .bigtarget{font-size:30px; font-weight:700; letter-spacing:-.02em}
+  .planner .out{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px}
+  .outcell{background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:13px 14px}
+  .outcell .n{font-size:22px; font-weight:680; font-family:var(--font-mono)} .outcell .l{font-size:11.5px; color:var(--muted); margin-top:3px} .outcell .d{font-size:11px; color:var(--faint); margin-top:5px}
+  .chartwrap{padding:18px}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+  .legend .lk{display:inline-flex;align-items:center;gap:6px} .legend .sw{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .wf{display:flex;flex-direction:column}
+  .wfrow{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .wfrow:last-child{border-bottom:0;font-weight:700}
+  .wf .pos{color:var(--good)} .wf .neg{color:var(--bad)}
+
+  .filters{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:16px}
+  .chip{display:inline-flex; align-items:center; gap:6px; border:1px solid var(--line-2); background:var(--surface); color:var(--muted); padding:6px 11px; border-radius:20px; font-size:12.5px; font-weight:520}
+  .chip:hover{background:var(--surface-2)} .chip.on{background:var(--ink); color:var(--paper); border-color:var(--ink)} .chip .x{opacity:.6}
+
+  .board{display:grid; grid-auto-flow:column; grid-auto-columns:minmax(224px,1fr); gap:12px; overflow-x:auto; padding-bottom:14px}
+  .col{background:var(--surface-2); border:1px solid var(--line); border-radius:12px; padding:10px; display:flex; flex-direction:column; min-height:120px}
+  .colhead{display:flex; flex-direction:column; gap:2px; padding:2px 4px 10px}
+  .colhead .ctline{display:flex; align-items:center; justify-content:space-between}
+  .colhead .ct{font-size:12px; font-weight:640; display:flex; align-items:center; gap:7px}
+  .dot{width:8px;height:8px;border-radius:50%} .colhead .cv{font-size:10.5px; color:var(--faint); font-family:var(--font-mono)}
+  .colhead .cdesc{font-size:10px; color:var(--faint); padding-left:15px}
+  .cards{display:flex; flex-direction:column; gap:9px; min-height:40px; border-radius:8px; transition:background .12s}
+  .cards.dragover{background:var(--accent-soft); outline:2px dashed var(--accent-line)}
+  .deal{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:11px; box-shadow:var(--shadow); cursor:pointer; transition:border-color .12s, transform .12s; display:flex; flex-direction:column; gap:8px}
+  .deal:hover{border-color:var(--accent-line); transform:translateY(-1px)} .deal.dragging{opacity:.4}
+  .deal .dco{font-size:13px; font-weight:620} .deal .drow{display:flex; align-items:center; justify-content:space-between}
+  .badge{font-size:9.5px; font-weight:700; letter-spacing:.03em; padding:3px 7px; border-radius:6px; text-transform:uppercase}
+  .b-claudit{background:var(--teal-soft); color:var(--teal)} .b-land{background:var(--accent-soft); color:var(--accent-ink)} .b-prog{background:var(--good-soft); color:var(--good)} .b-ret{background:var(--plum-soft); color:var(--plum)}
+  .deal .dval{font-family:var(--font-mono); font-weight:680; font-size:13.5px}
+  .deal .dmeta{display:flex; align-items:center; gap:7px; font-size:10.5px; color:var(--faint); flex-wrap:wrap}
+  .srcpill{display:inline-flex; align-items:center; gap:4px; font-size:10px; padding:2px 7px; border-radius:12px; background:var(--surface-2); color:var(--muted); border:1px solid var(--line)}
+  .mini-av{width:18px;height:18px;border-radius:50%; display:grid;place-items:center; font-size:9px; font-weight:700; color:#fff} .av-j{background:#2E736B}.av-g{background:#B4701A}
+
+  table{width:100%; border-collapse:collapse}
+  .tbl{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); overflow:hidden; box-shadow:var(--shadow)}
+  .tbl th{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--faint); text-align:left; padding:11px 14px; border-bottom:1px solid var(--line); font-weight:640; white-space:nowrap}
+  .tbl td{padding:12px 14px; border-bottom:1px solid var(--line); font-size:13px; vertical-align:middle}
+  .tbl tr:last-child td{border-bottom:0} .tbl tbody tr{cursor:pointer} .tbl tbody tr:hover{background:var(--surface-2)}
+  .money{font-family:var(--font-mono); font-weight:620}
+  .pill{display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600; padding:3px 9px; border-radius:20px}
+  .p-good{background:var(--good-soft); color:var(--good)} .p-warn{background:var(--accent-soft); color:var(--accent-ink)} .p-neut{background:var(--surface-2); color:var(--muted)} .p-bad{background:var(--bad-soft); color:var(--bad)} .p-blue{background:var(--blue-soft);color:var(--blue)}
+  .tblscroll{overflow-x:auto}
+
+  .detail{display:grid; grid-template-columns:1fr 336px; gap:20px; align-items:start}
+  .dh{display:flex; align-items:flex-start; gap:16px; margin-bottom:6px}
+  .dh .logo{width:48px;height:48px;border-radius:12px; background:var(--surface-3); display:grid;place-items:center; font-weight:700; font-size:18px; color:var(--muted); flex:none}
+  .sub{color:var(--muted); font-size:13px}
+  .linkr{display:inline-flex; align-items:center; gap:5px; color:var(--teal); font-weight:560; font-size:12.5px; text-decoration:none; border:1px solid var(--line-2); padding:4px 9px; border-radius:8px}
+  .linkr:hover{background:var(--surface-2)}
+  .stage-track{display:flex; gap:4px; margin:18px 0 6px; flex-wrap:wrap}
+  .st{flex:1; min-width:78px; padding:6px 4px; border-radius:7px; background:var(--surface-2); text-align:center; font-size:10.5px; font-weight:600; color:var(--faint); border:1px solid var(--line)}
+  .st small{display:block; font-size:9px; font-weight:500; opacity:.8; margin-top:1px}
+  .st.done{background:var(--good-soft); color:var(--good); border-color:transparent}
+  .st.cur{background:linear-gradient(160deg,var(--accent),var(--accent-ink)); color:#fff; border-color:transparent; box-shadow:0 2px 8px rgba(180,112,26,.3)}
+  .tagrow{display:flex; align-items:center; gap:7px; flex-wrap:wrap; margin-top:14px}
+  .dtag{display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:560; padding:4px 10px; border-radius:16px; background:var(--surface-2); border:1px solid var(--line); color:var(--muted)}
+  .dtag.add{border-style:dashed; color:var(--accent-ink); cursor:pointer}
+
+  .timeline{position:relative; padding-left:26px; display:flex; flex-direction:column; gap:2px}
+  .timeline:before{content:""; position:absolute; left:8px; top:6px; bottom:10px; width:2px; background:var(--line)}
+  .tev{position:relative; padding:12px 0} .tev .tdot{position:absolute; left:-22px; top:15px; width:15px;height:15px; border-radius:50%; border:2px solid var(--surface); background:var(--faint)}
+  .tev.call .tdot{background:var(--teal)} .tev.email .tdot{background:var(--accent)} .tev.stagechg .tdot{background:var(--good)} .tev.dm .tdot{background:var(--violet)}
+  .tev .thd{display:flex; align-items:center; gap:9px; flex-wrap:wrap} .tev .tt{font-size:13px; font-weight:600} .tev .tm{font-size:11px; color:var(--faint); font-family:var(--font-mono)}
+  .tev .tbody{font-size:12.5px; color:var(--muted); margin-top:6px; background:var(--surface-2); border:1px solid var(--line); border-radius:9px; padding:10px 12px}
+  .tev .tbody.ai{border-color:var(--accent-line); background:var(--accent-soft)}
+  .tlink{display:inline-flex;align-items:center;gap:4px;color:var(--teal);font-size:11.5px;font-weight:560;margin-top:7px}
+
+  .kv{display:flex; justify-content:space-between; gap:10px; padding:9px 0; border-bottom:1px solid var(--line); align-items:center} .kv:last-child{border-bottom:0}
+  .kv .k{font-size:11px; color:var(--faint); font-weight:560} .kv .v{font-size:13px; font-weight:560; text-align:right}
+  .rail{display:flex; flex-direction:column; gap:16px; position:sticky; top:82px}
+  .rail .card{padding:15px 16px} .rail h3{font-size:12.5px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between}
+  .asset{display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:9px; border:1px solid var(--line); margin-top:8px; transition:.12s; cursor:pointer; background:var(--surface)}
+  .asset:hover{border-color:var(--accent-line); background:var(--accent-soft)}
+  .asset .fi{width:30px;height:30px;border-radius:7px; display:grid;place-items:center; flex:none; font-size:13px} .asset .an{font-size:12.5px; font-weight:560} .asset .am{font-size:10.5px; color:var(--faint)}
+  .aiblock{display:flex; flex-direction:column; gap:8px} .aiblock .btn{justify-content:flex-start; width:100%}
+
+  /* editable affordance */
+  .edit{border-bottom:1px dashed transparent; cursor:text; padding:1px 2px; border-radius:3px; transition:.12s; outline:none}
+  .edit:hover{border-bottom-color:var(--line-2); background:var(--surface-2)}
+  .edit:focus{background:var(--accent-soft); border-bottom-color:var(--accent)}
+  select.mini{font-family:inherit; font-size:12.5px; font-weight:560; border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:7px; padding:4px 7px; cursor:pointer}
+  .editnote{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--faint);background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:3px 10px}
+
+  /* MEDDIC */
+  .meddic{display:flex; flex-direction:column}
+  .mrow{display:grid; grid-template-columns:20px 1fr; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); align-items:start} .mrow:last-child{border-bottom:0}
+  .mstate{width:16px;height:16px;border-radius:50%; margin-top:2px; display:grid;place-items:center; font-size:10px; color:#fff; font-weight:800}
+  .m-known{background:var(--good)} .m-part{background:var(--warn)} .m-gap{background:var(--surface-3); border:1.5px dashed var(--line-2)}
+  .mrow .ml{font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--faint); font-weight:700} .mrow .mv{font-size:12.5px; color:var(--ink); margin-top:2px} .mrow .mv.gap{color:var(--bad); font-style:italic; font-weight:500}
+  .mscore{display:flex; align-items:center; gap:10px; margin-bottom:6px} .mscorebar{flex:1; height:7px; border-radius:4px; background:var(--surface-2); overflow:hidden} .mscorebar span{display:block; height:100%; background:linear-gradient(90deg,var(--warn),var(--good))}
+
+  /* score ring */
+  .ring{width:64px;height:64px; flex:none} .gauge{display:flex; align-items:center; gap:14px} .gauge .gt{font-size:22px; font-weight:700} .gauge .gl{font-size:11.5px; color:var(--muted)}
+  .champbar{display:flex;align-items:center;gap:8px} .champtrack{width:52px;height:7px;border-radius:4px;background:var(--surface-2);overflow:hidden} .champtrack span{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--warn),var(--good))}
+  .prog{display:flex; flex-direction:column; gap:11px} .pgrow{display:grid; grid-template-columns:130px 1fr 42px; gap:12px; align-items:center; font-size:12.5px}
+  .pgbar{height:9px; border-radius:5px; background:var(--surface-2); overflow:hidden} .pgbar span{display:block;height:100%; background:linear-gradient(90deg,var(--teal),var(--good)); border-radius:5px} .pgn{font-family:var(--font-mono); font-size:12px; color:var(--muted); text-align:right}
+  .quote{background:var(--surface-2); border:1px solid var(--line); border-left:3px solid var(--teal); border-radius:9px; padding:12px 14px; font-size:12.5px; color:var(--ink); font-style:italic; margin-bottom:10px}
+  .quote cite{display:block; font-style:normal; color:var(--faint); font-size:11px; margin-top:6px}
+  .ttype{font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 6px;border-radius:5px}
+  .tt-video{background:var(--plum-soft);color:var(--plum)} .tt-written{background:var(--teal-soft);color:var(--teal)} .tt-doc{background:var(--accent-soft);color:var(--accent-ink)}
+
+  /* content */
+  .cboard{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+  .cbcol{background:var(--surface-2); border:1px solid var(--line); border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:10px}
+  .cpost{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px; box-shadow:var(--shadow); display:flex; flex-direction:column; gap:8px}
+  .cpost .ct{font-size:13px; font-weight:600; line-height:1.35} .cpost .cm{display:flex; align-items:center; gap:8px; font-size:11px; color:var(--faint); flex-wrap:wrap}
+  .chan{font-size:10px; font-weight:700; padding:2px 6px; border-radius:5px; letter-spacing:.04em} .ch-li{background:var(--blue-soft); color:var(--blue)} .ch-ig{background:#F5DEE8; color:#B23A70} .ch-tt{background:var(--surface-3); color:var(--muted)}
+  :root[data-theme="dark"] .ch-ig{background:#331E28; color:#DB8AAC}
+  .cattag{font-size:10px; font-weight:600; padding:2px 7px; border-radius:12px} .cat-info{background:var(--teal-soft);color:var(--teal)} .cat-story{background:var(--accent-soft);color:var(--accent-ink)} .cat-personal{background:var(--violet-soft);color:var(--violet)}
+  .metrics-mini{display:flex; gap:12px; font-size:11px; color:var(--muted); font-family:var(--font-mono)}
+  .bars{display:flex; flex-direction:column; gap:12px; padding:18px} .barrow{display:grid; grid-template-columns:120px 1fr 60px; gap:12px; align-items:center; font-size:12.5px}
+  .bartrack{height:26px; border-radius:7px; background:var(--surface-2); overflow:hidden} .bartrack span{display:block; height:100%; border-radius:7px} .bt-info{background:var(--teal)} .bt-story{background:var(--accent)} .bt-personal{background:var(--violet)}
+
+  /* schema / arch */
+  .schema{display:grid; grid-template-columns:repeat(4,1fr); gap:14px}
+  .entity{background:var(--surface); border:1px solid var(--line); border-radius:12px; overflow:hidden; box-shadow:var(--shadow)} .entity.core{border-color:var(--accent-line)}
+  .entity .eh{padding:11px 14px; font-weight:660; font-size:13px; display:flex; align-items:center; gap:8px; border-bottom:1px solid var(--line); background:var(--surface-2)} .entity.core .eh{background:var(--accent-soft); color:var(--accent-ink)}
+  .entity ul{list-style:none; margin:0; padding:8px 0} .entity li{padding:4px 14px; font-size:12px; color:var(--muted); display:flex; justify-content:space-between; gap:8px} .entity li .ty{font-family:var(--font-mono); font-size:10.5px; color:var(--faint)} .entity li.link{color:var(--teal); font-weight:560}
+  .relnote{font-size:12px; color:var(--muted); background:var(--surface-2); border:1px dashed var(--line-2); border-radius:10px; padding:12px 15px; margin-top:14px}
+  .layers{display:flex; flex-direction:column} .layer{border:1px solid var(--line); background:var(--surface); border-radius:12px; padding:14px 16px; box-shadow:var(--shadow)}
+  .layer .lh{display:flex; align-items:center; gap:10px; margin-bottom:10px} .layer .lnum{width:22px;height:22px;border-radius:6px; background:var(--ink); color:var(--paper); display:grid;place-items:center; font-size:11px; font-weight:700; flex:none} .layer .lt{font-size:13.5px; font-weight:660} .layer .ld{font-size:11.5px; color:var(--faint)}
+  .layer.spine{border-color:var(--accent-line); background:linear-gradient(120deg,var(--accent-soft),var(--surface))} .layer.spine .lnum{background:var(--accent)}
+  .nodes{display:flex; gap:8px; flex-wrap:wrap} .node{font-size:12px; font-weight:540; padding:7px 11px; border-radius:8px; background:var(--surface-2); border:1px solid var(--line); color:var(--ink); display:inline-flex; align-items:center; gap:6px} .node.tbl2{background:var(--surface); border-color:var(--accent-line)} .node .swap{font-size:9px; color:var(--faint); background:var(--surface); border:1px solid var(--line); padding:1px 5px; border-radius:10px}
+  .flowdown{display:grid; place-items:center; color:var(--faint); padding:5px 0; font-size:15px}
+
+  .callout{display:flex; gap:12px; padding:14px 16px; border-radius:12px; background:var(--accent-soft); border:1px solid var(--accent-line); margin:8px 0 22px; font-size:13px; color:var(--accent-ink)} .callout b{color:var(--accent-ink)}
+  .flag{display:inline-block; font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--warn); background:var(--accent-soft); padding:2px 7px; border-radius:5px; border:1px solid var(--accent-line)}
+
+  .toast{position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--ink); color:var(--paper); padding:11px 18px; border-radius:10px; font-size:13px; font-weight:520; box-shadow:var(--shadow-lg); opacity:0; pointer-events:none; transition:.25s; z-index:120; display:flex; align-items:center; gap:9px}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)} .toast .tk{color:var(--accent-ink); background:var(--accent-soft); border-radius:5px; padding:1px 6px; font-size:11px; font-weight:700}
+
+  /* modal */
+  .overlay{position:fixed; inset:0; background:rgba(20,18,14,.5); backdrop-filter:blur(3px); z-index:100; display:none; align-items:flex-start; justify-content:center; padding:60px 20px; overflow-y:auto} .overlay.show{display:flex}
+  .modal{background:var(--surface); border:1px solid var(--line-2); border-radius:16px; box-shadow:var(--shadow-lg); width:100%; max-width:520px; overflow:hidden}
+  .modal .mh{padding:18px 20px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between} .modal .mh h2{font-size:16px}
+  .modal .mb{padding:20px; display:grid; grid-template-columns:1fr 1fr; gap:14px}
+  .fld{display:flex; flex-direction:column; gap:5px} .fld.full{grid-column:1/-1} .fld label{font-size:11px; font-weight:640; text-transform:uppercase; letter-spacing:.05em; color:var(--faint)}
+  .fld input,.fld select{font-family:inherit; font-size:13.5px; padding:9px 11px; border:1px solid var(--line-2); border-radius:9px; background:var(--paper); color:var(--ink)}
+  .fld input:focus,.fld select:focus{outline:2px solid var(--accent-line); border-color:var(--accent)}
+  .modal .mf{padding:16px 20px; border-top:1px solid var(--line); display:flex; justify-content:flex-end; gap:10px}
+
+  @media (max-width:1080px){
+    .g5,.g4{grid-template-columns:repeat(2,1fr)} .g3{grid-template-columns:1fr} .detail{grid-template-columns:1fr} .schema{grid-template-columns:repeat(2,1fr)} .cboard{grid-template-columns:1fr} .modal .mb{grid-template-columns:1fr}
+    .app{grid-template-columns:1fr} .sidebar{display:none}
+  }
+</style>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="mark">✳</div><div><b>Get AI Powers</b><span>RevOps Command Center</span></div></div>
+    <div class="navsec">Overview</div>
+    <button class="navlink active" data-view="revenue"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Revenue Room</button>
+    <button class="navlink" data-view="dashboard"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Analytics</button>
+    <div class="navsec">Sales</div>
+    <button class="navlink" data-view="prospects"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Prospects<span class="cnt">100</span></button>
+    <button class="navlink" data-view="pipeline"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="4" height="16" rx="1.2"/><rect x="10" y="4" width="4" height="11" rx="1.2"/><rect x="17" y="4" width="4" height="7" rx="1.2"/></svg>Pipeline<span class="cnt">11</span></button>
+    <button class="navlink" data-view="deal"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v14H4z"/><path d="M4 9h16M9 13h7M9 16h4"/></svg>Deal workspace</button>
+    <div class="navsec">Accounts</div>
+    <button class="navlink" data-view="clients"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21V7l7-4 7 4v14M7 21v-5h6v5M21 21V10l-4-2"/></svg>Clients<span class="cnt">9</span></button>
+    <button class="navlink" data-view="stakeholders"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Stakeholders<span class="cnt">61</span></button>
+    <button class="navlink" data-view="partners"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="8" r="3.2"/><circle cx="17" cy="10" r="2.6"/><path d="M3 20c0-3 2.2-5 5-5s5 2 5 5M15 20c0-2.2 1-3.6 2.8-3.9"/></svg>Partners<span class="cnt">7</span></button>
+    <div class="navsec">Delivery</div>
+    <button class="navlink" data-view="delivery"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 11.1V5a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h9M16 19l2 2 4-4M7 8h10M7 12h6"/></svg>Delivery hub</button>
+    <div class="navsec">Marketing</div>
+    <button class="navlink" data-view="content"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 12h8M8 15h5"/></svg>Content bank<span class="cnt">24</span></button>
+    <button class="navlink" data-view="analytics"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Content analytics</button>
+    <div class="navsec">Reference</div>
+    <button class="navlink" data-view="assets"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg>Assets &amp; proposals</button>
+    <button class="navlink" data-view="schema"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><path d="M10 6.5h4a2 2 0 0 1 2 2v5.5"/></svg>Data model</button>
+    <button class="navlink" data-view="arch"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2 2 7l10 5 10-5z"/><path d="M2 12l10 5 10-5M2 17l10 5 10-5"/></svg>Architecture</button>
+    <div class="side-foot"><div class="avatar">JS</div><div><b style="font-size:12.5px">Joey Speed</b><small>Co-Founder</small></div>
+      <button class="iconbtn" id="themeToggle" title="Toggle theme" style="margin-left:auto; width:30px; height:30px"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div><div class="crumb" id="crumb">Overview</div><h1 id="ptitle">Revenue Room</h1></div>
+      <div class="spacer"></div>
+      <button class="btn ai" data-toast="Claude would open a chat scoped to this data.">✳ Ask Claude</button>
+      <button class="btn primary" id="newDealBtn">＋ New deal</button>
+    </div>
+
+    <!-- REVENUE ROOM -->
+    <section class="view active" id="view-revenue">
+      <div class="callout"><span>💷</span><div>The <b>money view</b> — recurring (MRR) vs project revenue, month by month, with a <b>forecast driven by your weighted pipeline</b>. A projection &amp; strategy tool, separate from Sales analytics. <b>Sample data · forecast illustrative.</b></div></div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px;flex-wrap:wrap">
+        <div class="eyebrow">Basis</div>
+        <div class="seg" id="basisSeg"><button class="on">Booked</button><button>Cash collected</button></div>
+        <span class="note" style="color:var(--faint);font-size:12px">forecast horizon: 12 months · tied to live pipeline</span>
+      </div>
+      <div class="kpigrid g5">
+        <div class="card kpi hero"><div class="lab">Revenue · this month</div><div class="val tnum">£62<small>k</small></div><div class="delta up tnum">▲ 13% vs Jul</div><div class="foot">MRR £22k + project £40k</div></div>
+        <div class="card kpi"><div class="lab">MRR (recurring)</div><div class="val tnum">£22<small>k</small></div><div class="delta up tnum">▲ £2k net</div><div class="foot">3 retainers</div></div>
+        <div class="card kpi"><div class="lab">Run-rate (ARR)</div><div class="val tnum">£264<small>k</small></div><div class="foot">MRR × 12</div></div>
+        <div class="card kpi"><div class="lab">Project revenue · MTD</div><div class="val tnum">£40<small>k</small></div><div class="foot">Land + Programme</div></div>
+        <div class="card kpi"><div class="lab">Forecast · next 3 mo</div><div class="val tnum" id="kNext3">£—</div><div class="foot">weighted pipeline + MRR</div></div>
+      </div>
+      <div class="sectionhead"><h2>Revenue &amp; cashflow — actual vs forecast</h2><span class="note">stacked MRR + project, month by month</span><div class="line"></div></div>
+      <div class="card"><div class="chartwrap">
+        <svg id="revChart" viewBox="0 0 760 300" width="100%" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Monthly revenue: actual and forecast"></svg>
+        <div class="legend" style="margin-top:10px;padding-left:8px">
+          <span class="lk"><span class="sw" style="background:var(--accent)"></span> MRR (recurring)</span>
+          <span class="lk"><span class="sw" style="background:var(--teal)"></span> Project / one-off</span>
+          <span class="lk"><span class="sw" style="background:var(--surface-3);border:1px dashed var(--line-2)"></span> Forecast</span>
+        </div>
+      </div></div>
+      <div class="kpigrid g2" style="margin-top:22px">
+        <div>
+          <div class="sectionhead" style="margin-top:0"><h2>Forecast from pipeline</h2><span class="note">value × stage probability</span><div class="line"></div></div>
+          <div class="tbl"><table><thead><tr><th>Stage</th><th>Open value</th><th>Prob.</th><th>Weighted</th></tr></thead><tbody>
+            <tr><td>New biz meeting</td><td class="money">£30k</td><td class="tnum">20%</td><td class="money">£6.0k</td></tr>
+            <tr><td>Business case</td><td class="money">£33k</td><td class="tnum">40%</td><td class="money">£13.2k</td></tr>
+            <tr><td>Proposal</td><td class="money">£34k</td><td class="tnum">60%</td><td class="money">£20.4k</td></tr>
+            <tr><td>Negotiation</td><td class="money">£84k</td><td class="tnum">80%</td><td class="money">£67.2k</td></tr>
+            <tr style="font-weight:700"><td>Weighted pipeline</td><td class="money">£181k</td><td></td><td class="money">£106.8k</td></tr>
+          </tbody></table></div>
+          <div class="note" style="font-size:11px;color:var(--faint);margin-top:8px">Retainers contribute annualised (MRR × 12). Probabilities are set in the spec — Q41.</div>
+        </div>
+        <div>
+          <div class="sectionhead" style="margin-top:0"><h2>MRR movement · this month</h2><div class="line"></div></div>
+          <div class="card" style="padding:16px 18px"><div class="wf">
+            <div class="wfrow"><span>Starting MRR (Jul)</span><span class="money">£20.0k</span></div>
+            <div class="wfrow"><span class="pos">+ New business</span><span class="money pos">+£2.5k</span></div>
+            <div class="wfrow"><span class="pos">+ Expansion</span><span class="money pos">+£0.5k</span></div>
+            <div class="wfrow"><span class="neg">− Churn</span><span class="money neg">−£1.0k</span></div>
+            <div class="wfrow"><span>Ending MRR (Aug)</span><span class="money">£22.0k</span></div>
+          </div></div>
+          <div class="note" style="font-size:11px;color:var(--faint);margin-top:10px">SaaS-style MRR waterfall — the health of your recurring base at a glance.</div>
+        </div>
+      </div>
+      <div class="sectionhead"><h2>Projection &amp; strategy</h2><span class="note">flex the assumptions — chart &amp; forecast update live</span><div class="line"></div></div>
+      <div class="card planner">
+        <div class="kpigrid g2" style="gap:24px">
+          <div>
+            <label>Pipeline conversion <span id="convVal" class="tnum" style="color:var(--accent-ink);font-weight:700">100%</span></label>
+            <div class="rangewrap"><span class="tnum" style="font-size:11px;color:var(--faint)">50%</span><input type="range" min="50" max="150" step="5" value="100" id="convRange"><span class="tnum" style="font-size:11px;color:var(--faint)">150%</span></div>
+            <label style="margin-top:16px;display:block">Monthly retainer churn <span id="churnVal" class="tnum" style="color:var(--accent-ink);font-weight:700">3%</span></label>
+            <div class="rangewrap"><span class="tnum" style="font-size:11px;color:var(--faint)">0%</span><input type="range" min="0" max="10" step="1" value="3" id="churnRange"><span class="tnum" style="font-size:11px;color:var(--faint)">10%</span></div>
+            <div class="d" style="font-size:11px;color:var(--faint);margin-top:14px">Drag to model best/worst case — "if we close 130% of plan and churn holds at 2%, here's next year."</div>
+          </div>
+          <div class="out" style="margin-top:0">
+            <div class="outcell"><div class="n tnum" id="oNext3">£—</div><div class="l">Next 3 months</div></div>
+            <div class="outcell"><div class="n tnum" id="oNext6">£—</div><div class="l">Next 6 months</div></div>
+            <div class="outcell"><div class="n tnum" id="oNext12">£—</div><div class="l">Next 12 months</div></div>
+            <div class="outcell"><div class="n tnum" id="oExitArr">£—</div><div class="l">Exit run-rate (ARR)</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SALES ANALYTICS -->
+    <section class="view" id="view-dashboard">
+      <div class="callout"><span>✳</span><div><b>Layout prototype</b> · sample data. The time filter (below) and the pipeline drag, view-toggles, New-deal form and inline edits are all live to click. Every number would feed from your tools — see <b>Architecture</b>.</div></div>
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:6px; flex-wrap:wrap">
+        <div class="eyebrow">Showing</div>
+        <div class="seg" id="rangeSeg"><button data-f="0.25">This week</button><button class="on" data-f="1">This month</button><button data-f="3">This quarter</button><button data-f="12">This year</button></div>
+      </div>
+      <div class="sectionhead"><h2>North-star ratios</h2><span class="note">the science — cost of a client, in units you control</span><div class="line"></div></div>
+      <div class="kpigrid g3">
+        <div class="card kpi hero"><div class="lab">DMs per signed client</div><div class="val tnum">163</div><div class="delta down tnum">▼ 11% vs prev</div><div class="foot">Fewer messages per win.</div></div>
+        <div class="card kpi hero"><div class="lab">Revenue per outbound DM</div><div class="val tnum">£111<small>/DM</small></div><div class="delta up tnum">▲ 8% vs prev</div><div class="foot">Blended across all deal types.</div></div>
+        <div class="card kpi hero"><div class="lab">Posts per signed client</div><div class="val tnum">4.5</div><div class="delta up tnum">▲ steady</div><div class="foot">Content-attributed wins ÷ posts.</div></div>
+      </div>
+      <div class="sectionhead"><h2>Leading indicators</h2><span class="note">volume you own entirely — the inputs</span><div class="line"></div></div>
+      <div class="kpigrid g4">
+        <div class="card kpi"><div class="lab"><span class="tag-lead">Lead</span> Posts published</div><div class="val tnum" data-base="18">18</div><div class="foot">LinkedIn · IG · TikTok</div></div>
+        <div class="card kpi"><div class="lab"><span class="tag-lead">Lead</span> Outbound DMs sent</div><div class="val tnum" data-base="652">652</div><div class="delta up tnum">▲ 22%</div></div>
+        <div class="card kpi"><div class="lab"><span class="tag-lead">Lead</span> Emails sent</div><div class="val tnum" data-base="214">214</div><div class="foot">sequences + 1:1</div></div>
+        <div class="card kpi"><div class="lab"><span class="tag-lead">Lead</span> Claudit calls booked</div><div class="val tnum" data-base="11">11</div><div class="foot">from 19 offered</div></div>
+      </div>
+      <div class="sectionhead"><h2>Lagging indicators</h2><span class="note">outcomes — the results</span><div class="line"></div></div>
+      <div class="kpigrid g4">
+        <div class="card kpi"><div class="lab"><span class="tag-lag">Lag</span> New-biz meetings</div><div class="val tnum" data-base="14">14</div><div class="delta up tnum">▲ 3</div></div>
+        <div class="card kpi"><div class="lab"><span class="tag-lag">Lag</span> Meeting → Qualified</div><div class="val tnum">57<small>%</small></div><div class="foot">ratio — window-independent</div></div>
+        <div class="card kpi"><div class="lab"><span class="tag-lag">Lag</span> Qualified pipeline</div><div class="val tnum">£<span data-base="128" data-suffix="k">128</span></div><div class="foot">open deals</div></div>
+        <div class="card kpi"><div class="lab"><span class="tag-lag">Lag</span> Closed won</div><div class="val tnum">£<span data-base="71" data-suffix="k">71</span></div><div class="foot"><span data-base="4">4</span> deals</div></div>
+      </div>
+      <div class="kpigrid g2" style="margin-top:22px">
+        <div><div class="sectionhead" style="margin-top:0"><h2>Land-and-expand funnel</h2><div class="line"></div></div>
+          <div class="card funnel">
+            <div class="frow"><div class="fl">Claudit done<small>free foot-in-door</small></div><div class="fbar"><span style="width:100%"></span><em>20</em></div><div class="fconv">—</div></div>
+            <div class="frow"><div class="fl">Land<small>£1–3k</small></div><div class="fbar"><span style="width:45%"></span><em>9</em></div><div class="fconv"><b>45%</b> ↳</div></div>
+            <div class="frow"><div class="fl">Programme<small>£1.5–4k/head</small></div><div class="fbar"><span style="width:27%"></span><em>6</em></div><div class="fconv"><b>67%</b> ↳</div></div>
+            <div class="frow"><div class="fl">Retainer<small>£4.4–14k MRR</small></div><div class="fbar"><span style="width:14%"></span><em>3</em></div><div class="fconv"><b>50%</b> ↳</div></div>
+          </div>
+        </div>
+        <div><div class="sectionhead" style="margin-top:0"><h2>Capacity planner</h2><span class="note">back-solve resources from a target</span><div class="line"></div></div>
+          <div class="card planner">
+            <label>Monthly revenue target</label><div class="bigtarget tnum" id="targetVal">£250k</div>
+            <div class="rangewrap"><span class="tnum" style="font-size:11px;color:var(--faint)">£50k</span><input type="range" min="50" max="1000" step="25" value="250" id="targetRange"><span class="tnum" style="font-size:11px;color:var(--faint)">£1m</span></div>
+            <div class="out">
+              <div class="outcell"><div class="n tnum" id="needDMs">2,252</div><div class="l">DMs / month</div><div class="d">@ £111 rev/DM</div></div>
+              <div class="outcell"><div class="n tnum" id="needPosts">50</div><div class="l">Posts / month</div><div class="d">@ 4.5 posts/client</div></div>
+              <div class="outcell"><div class="n tnum" id="needMeetings">30</div><div class="l">Meetings / month</div><div class="d">to hit qualified rate</div></div>
+              <div class="outcell"><div class="n tnum" id="needHeads">2.3</div><div class="l">SDRs to staff it</div><div class="d">@ ~1k DMs/head</div></div>
+            </div>
+            <div class="d" style="font-size:11px;color:var(--faint);margin-top:12px">Your "£1m needs 10k DMs → justifies a hire" model, live off your own ratios.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROSPECTS -->
+    <section class="view" id="view-prospects">
+      <div class="callout"><span>🎯</span><div><b>Your target account list</b> — fed from Clay / Apollo. This example is your <b>UK recruitment-agency CEOs, 10–200 staff</b> list (sample list). When any stakeholder from an account <b>books a Claudit call, they auto-move into the Pipeline</b>. Log "not now, later" prospects as Nurture so nothing's lost.</div></div>
+      <div class="filters">
+        <span class="chip on filt">Industry: Recruitment <span class="x">▾</span></span>
+        <span class="chip filt">Size: 10–200 <span class="x">▾</span></span>
+        <span class="chip filt">Status: All <span class="x">▾</span></span>
+        <span class="chip filt">Owner: All</span>
+        <div class="spacer"></div>
+        <button class="btn sm" data-toast="Would import a fresh list from Clay / Apollo / CSV.">⭳ Import from Clay</button>
+        <button class="btn primary sm" id="newDealBtn2">＋ New deal</button>
+      </div>
+      <div class="kpigrid g4" style="margin-bottom:16px">
+        <div class="card kpi"><div class="lab">Target accounts</div><div class="val tnum">100</div><div class="foot">Recruitment · UK</div></div>
+        <div class="card kpi"><div class="lab">In sequence</div><div class="val tnum">38</div><div class="foot">DM + email running</div></div>
+        <div class="card kpi"><div class="lab">Nurture (later)</div><div class="val tnum">12</div><div class="foot">interested, not now</div></div>
+        <div class="card kpi"><div class="lab">Converted → pipeline</div><div class="val tnum">6</div><div class="foot">booked a Claudit</div></div>
+      </div>
+      <div class="tbl tblscroll"><table>
+        <thead><tr><th>Prospect</th><th>Title</th><th>Company</th><th>Size</th><th>City</th><th>Status</th><th>Owner</th><th></th></tr></thead>
+        <tbody>
+          <tr data-open="prospect"><td><b>Jordan Mills</b><div style="color:var(--faint);font-size:11px">jordan@apextalent.example · 🔗 LI</div></td><td>CEO</td><td>Apex Talent</td><td class="tnum">208</td><td>Brighton</td><td><span class="pill p-blue">Sequenced</span></td><td><span class="mini-av av-j">J</span></td><td><button class="btn sm" data-toast="Books a Claudit call → auto-creates a deal at 'Call booked'.">Book Claudit ↦</button></td></tr>
+          <tr data-open="prospect"><td><b>Sam Whitfield</b><div style="color:var(--faint);font-size:11px">sam@northshore.example</div></td><td>Founder</td><td>Northshore Recruitment</td><td class="tnum">157</td><td>London</td><td><span class="pill p-warn">Nurture · Q4</span></td><td><span class="mini-av av-j">J</span></td><td><button class="btn sm" data-toast="Books a Claudit call → auto-creates a deal.">Book Claudit ↦</button></td></tr>
+          <tr data-open="prospect"><td><b>Alex Bennett</b><div style="color:var(--faint);font-size:11px">a.bennett@kingfisherstaffing.example</div></td><td>CEO</td><td>Kingfisher Staffing</td><td class="tnum">147</td><td>—</td><td><span class="pill p-good">Booked ↦ moved</span></td><td><span class="mini-av av-g">G</span></td><td><span style="color:var(--faint);font-size:11px">in pipeline</span></td></tr>
+          <tr data-open="prospect"><td><b>Priyanka Rao</b><div style="color:var(--faint);font-size:11px">p.rao@ridgewaysearch.example</div></td><td>CEO &amp; Founder</td><td>Ridgeway Search</td><td class="tnum">142</td><td>Bristol</td><td><span class="pill p-neut">New target</span></td><td><span class="mini-av av-g">G</span></td><td><button class="btn sm" data-toast="Books a Claudit call → auto-creates a deal.">Book Claudit ↦</button></td></tr>
+          <tr data-open="prospect"><td><b>Tom Clarke</b><div style="color:var(--faint);font-size:11px">t.clarke@harbourrec.example</div></td><td>Co-Founder</td><td>Harbour Recruitment</td><td class="tnum">198</td><td>London</td><td><span class="pill p-blue">Contacted</span></td><td><span class="mini-av av-j">J</span></td><td><button class="btn sm" data-toast="Books a Claudit call → auto-creates a deal.">Book Claudit ↦</button></td></tr>
+          <tr data-open="prospect"><td><b>Nadia Hassan</b><div style="color:var(--faint);font-size:11px">n.hassan@latitudetalent.example</div></td><td>Director &amp; Co-Founder</td><td>Latitude Talent</td><td class="tnum">152</td><td>London</td><td><span class="pill p-warn">Nurture · budget FY27</span></td><td><span class="mini-av av-j">J</span></td><td><button class="btn sm" data-toast="Books a Claudit call → auto-creates a deal.">Book Claudit ↦</button></td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- PROSPECT DETAIL -->
+    <section class="view" id="view-prospect">
+      <div class="dh"><div class="logo">J</div>
+        <div style="flex:1"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><h1 style="font-size:20px">Jordan Mills</h1><span class="pill p-blue">Sequenced</span><span class="pill p-neut">Cold target</span></div>
+          <div class="sub" style="margin-top:5px">CEO · Apex Talent · Brighton, England · from your <b>Clay recruitment list</b></div>
+          <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap">
+            <a class="linkr" href="#" onclick="return false">🔗 LinkedIn profile</a><a class="linkr" href="#" onclick="return false">✉️ jordan@apextalent.example</a><a class="linkr" href="#" onclick="return false">📞 +44 7…</a>
+          </div>
+        </div>
+        <button class="btn sm" data-view="prospects" data-nav>← All prospects</button>
+      </div>
+      <div class="callout"><span>ℹ️</span><div>This is a <b>cold prospect</b> — it shows the data you imported, <b>not a champion score</b>. A champion score only exists once they engage and become a <b>stakeholder</b> on a live account. This is the fix for the prospect≠stakeholder confusion.</div></div>
+      <div class="detail">
+        <div>
+          <div class="sectionhead" style="margin-top:0"><h2>Outreach activity</h2><span class="note">the cold-touch log</span><div class="line"></div></div>
+          <div class="timeline">
+            <div class="tev dm"><div class="tdot"></div><div class="thd"><span class="tt">LinkedIn connection accepted</span><span class="tm">5 Aug 2026</span></div></div>
+            <div class="tev dm"><div class="tdot"></div><div class="thd"><span class="tt">DM 1 sent — "using 1/10th" hook</span><span class="tm">6 Aug 2026</span></div><div class="tbody">No reply yet · sequence step 2 of 4 due 12 Aug.</div></div>
+            <div class="tev email"><div class="tdot"></div><div class="thd"><span class="tt">Email opened 2×</span><span class="tm">8 Aug 2026</span></div></div>
+          </div>
+          <div style="margin-top:18px"><button class="btn primary" data-toast="Books a Claudit → converts this prospect into a pipeline deal + a stakeholder record.">↦ Book Claudit &amp; convert to pipeline</button></div>
+        </div>
+        <div class="rail">
+          <div class="card"><h3>Prospect record <span class="eyebrow">from Clay</span></h3>
+            <div class="kv"><span class="k">Full name</span><span class="v">Jordan Mills</span></div>
+            <div class="kv"><span class="k">Title</span><span class="v">Chief Executive Officer</span></div>
+            <div class="kv"><span class="k">Company</span><span class="v">Apex Talent</span></div>
+            <div class="kv"><span class="k">Company size</span><span class="v">208 employees</span></div>
+            <div class="kv"><span class="k">Location</span><span class="v">Brighton, England, UK</span></div>
+            <div class="kv"><span class="k">Industry</span><span class="v">Recruitment</span></div>
+            <div class="kv"><span class="k">Work email</span><span class="v">jordan@apextalent.example</span></div>
+            <div class="kv"><span class="k">Mobile</span><span class="v">+44 7…</span></div>
+            <div class="kv"><span class="k">LinkedIn conns</span><span class="v">25,330</span></div>
+          </div>
+          <div class="card"><h3>Targeting <span class="eyebrow">editable</span></h3>
+            <div class="kv"><span class="k">Status</span><span class="v"><select class="mini"><option selected>Sequenced</option><option>New target</option><option>Contacted</option><option>Nurture (later)</option><option>Converted</option></select></span></div>
+            <div class="kv"><span class="k">Owner</span><span class="v">Joey</span></div>
+            <div class="kv"><span class="k">Source list</span><span class="v">UK Recruitment CEOs 10–200</span></div>
+            <div class="kv"><span class="k">ICP fit</span><span class="v"><span class="pill p-good">Strong</span></span></div>
+            <div class="kv"><span class="k">Next step</span><span class="v edit" contenteditable="true">DM 2 · 12 Aug</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PIPELINE -->
+    <section class="view wide" id="view-pipeline">
+      <div class="filters">
+        <span class="chip on filt">All deal types <span class="x">▾</span></span>
+        <span class="chip filt">Owner: All <span class="x">▾</span></span>
+        <span class="chip filt">Source: All <span class="x">▾</span></span>
+        <span class="chip filt">Partner-sourced</span>
+        <div class="spacer"></div>
+        <div class="seg" id="pipeSeg"><button class="on" data-p="Board">Board</button><button data-p="Table">Table</button><button data-p="Account">By account</button></div>
+      </div>
+      <div class="callout"><span>↦</span><div><b>Drag a card between columns</b> to change stage · switch <b>Board / Table / By account</b> top-right · all four deal types share these stages.</div></div>
+
+      <div id="pipeBoard">
+      <div class="board" id="board">
+        <div class="col"><div class="colhead"><div class="ctline"><div class="ct"><span class="dot" style="background:var(--blue)"></span>Call booked</div><div class="cv">2 · £0</div></div><div class="cdesc">enters pipeline on booking</div></div>
+          <div class="cards" data-col>
+            <div class="deal" draggable="true" data-open="deal"><div class="dco">Kingfisher Staffing</div><div class="drow"><span class="badge b-claudit">Claudit</span><span class="dval">£0</span></div><div class="dmeta"><span class="pill p-good" style="font-size:10px">↦ from Prospects</span></div><div class="dmeta"><span class="mini-av av-g">G</span> 1d</div></div>
+            <div class="deal" draggable="true" data-open="deal"><div class="dco">Willowbrook Care</div><div class="drow"><span class="badge b-claudit">Claudit</span><span class="dval">£0</span></div><div class="dmeta"><span class="srcpill">📨 Outbound DM</span></div><div class="dmeta"><span class="mini-av av-j">J</span> 2d</div></div>
+          </div>
+        </div>
+        <div class="col"><div class="colhead"><div class="ctline"><div class="ct"><span class="dot" style="background:var(--teal)"></span>New biz meeting</div><div class="cv">2 · £30k</div></div><div class="cdesc">the audit / first call happened</div></div>
+          <div class="cards" data-col>
+            <div class="deal" draggable="true" data-open="deal"><div class="dco">Cobalt Consulting</div><div class="drow"><span class="badge b-land">Land</span><span class="dval">£2.5k</span></div><div class="dmeta"><span class="srcpill">🤝 Bright Path</span></div><div class="dmeta"><span class="mini-av av-j">J</span> 3d</div></div>
+            <div class="deal" draggable="true" data-open="deal"><div class="dco">Sterling Investment</div><div class="drow"><span class="badge b-prog">Programme</span><span class="dval">£28k</span></div><div class="dmeta"><span class="srcpill">✍️ LinkedIn</span></div><div class="dmeta"><span class="mini-av av-j">J</span> 4d</div></div>
+          </div>
+        </div>
+        <div class="col"><div class="colhead"><div class="ctline"><div class="ct"><span class="dot" style="background:var(--violet)"></span>Business case</div><div class="cv">2 · £33k</div></div><div class="cdesc">scoping · MEDDIC qualification</div></div>
+          <div class="cards" data-col>
+            <div class="deal" draggable="true" data-open="deal"><div class="dco">Riverside Production</div><div class="drow"><span class="badge b-land">Land</span><span class="dval">£2.5k</span></div><div class="dmeta"><span class="srcpill">✍️ Content</span></div><div class="dmeta"><span class="mini-av av-j">J</span></div></div>
+            <div class="deal" draggable="true" data-open="deal"><div class="dco">Halcyon Recruitment</div><div class="drow"><span class="badge b-prog">Programme</span><span class="dval">£31k</span></div><div class="dmeta"><span class="srcpill">🤝 Sentinel</span></div><div class="dmeta"><span class="mini-av av-g">G</span></div></div>
+          </div>
+        </div>
+        <div class="col"><div class="colhead"><div class="ctline"><div class="ct"><span class="dot" style="background:var(--accent)"></span>Proposal</div><div class="cv">1 · £34k</div></div><div class="cdesc">proposal sent</div></div>
+          <div class="cards" data-col>
+            <div class="deal" draggable="true" data-open="deal" style="border-color:var(--accent-line)"><div class="dco">Meridian Care Homes</div><div class="drow"><span class="badge b-prog">Programme</span><span class="dval">£34k</span></div><div class="dmeta"><span class="srcpill">🤝 Sentinel</span></div><div class="dmeta"><span class="mini-av av-g">G</span> · sent 9 Aug</div></div>
+          </div>
+        </div>
+        <div class="col"><div class="colhead"><div class="ctline"><div class="ct"><span class="dot" style="background:var(--plum)"></span>Negotiation</div><div class="cv">1 · £84k</div></div><div class="cdesc">terms · procurement</div></div>
+          <div class="cards" data-col>
+            <div class="deal" draggable="true" data-open="deal"><div class="dco">Foldgate Foods</div><div class="drow"><span class="badge b-ret">Retainer</span><span class="dval">£7k/mo</span></div><div class="dmeta"><span class="srcpill">🔁 Expansion</span></div><div class="dmeta"><span class="mini-av av-g">G</span> · Scale · ARR £84k</div></div>
+          </div>
+        </div>
+        <div class="col"><div class="colhead"><div class="ctline"><div class="ct"><span class="dot" style="background:var(--good)"></span>Closed Won</div><div class="cv">2 · £51k</div></div><div class="cdesc">→ becomes a Client</div></div>
+          <div class="cards" data-col>
+            <div class="deal" draggable="true" data-open="deal"><div class="dco">Halcyon Recruitment</div><div class="drow"><span class="badge b-land">Land</span><span class="dval">£2.5k</span></div><div class="dmeta"><span class="srcpill">✍️ LinkedIn</span></div></div>
+            <div class="deal" draggable="true" data-open="deal"><div class="dco">Sentinel</div><div class="drow"><span class="badge b-prog">Programme</span><span class="dval">£48k</span></div><div class="dmeta"><span class="srcpill">🤝 Partner</span></div></div>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <div id="pipeTable" hidden><div class="tbl tblscroll"><table>
+        <thead><tr><th>Deal</th><th>Type</th><th>Value / MRR</th><th>Stage</th><th>Source</th><th>Owner</th><th>Close target</th></tr></thead>
+        <tbody>
+          <tr data-open="deal"><td>Meridian Care Homes</td><td><span class="badge b-prog">Programme</span></td><td class="money">£34k</td><td><span class="pill p-warn">Proposal</span></td><td>🤝 Sentinel</td><td>George</td><td>30 Sep 2026</td></tr>
+          <tr data-open="deal"><td>Foldgate Foods</td><td><span class="badge b-ret">Retainer</span></td><td class="money">£7k/mo</td><td><span class="pill p-warn">Negotiation</span></td><td>🔁 Expansion</td><td>George</td><td>20 Aug 2026</td></tr>
+          <tr data-open="deal"><td>Halcyon Recruitment</td><td><span class="badge b-prog">Programme</span></td><td class="money">£31k</td><td><span class="pill p-neut">Business case</span></td><td>🤝 Sentinel</td><td>George</td><td>15 Oct 2026</td></tr>
+          <tr data-open="deal"><td>Sterling Investment</td><td><span class="badge b-prog">Programme</span></td><td class="money">£28k</td><td><span class="pill p-neut">New biz meeting</span></td><td>✍️ LinkedIn</td><td>Joey</td><td>—</td></tr>
+          <tr data-open="deal"><td>Kingfisher Staffing</td><td><span class="badge b-claudit">Claudit</span></td><td class="money">£0</td><td><span class="pill p-blue">Call booked</span></td><td>↦ Prospect</td><td>George</td><td>—</td></tr>
+        </tbody>
+      </table></div></div>
+
+      <div id="pipeAccount" hidden>
+        <div class="sectionhead" style="margin-top:0"><h2>Grouped by account</h2><span class="note">deal-per-rung — total value rolls up per company</span><div class="line"></div></div>
+        <div class="tbl"><table>
+          <thead><tr><th>Account</th><th>Deals (rungs)</th><th>Account value</th><th>Stage of latest</th></tr></thead>
+          <tbody>
+            <tr data-open="deal"><td><b>Meridian Care Homes</b></td><td><span class="badge b-claudit">Claudit ✓</span> <span class="badge b-land">Land ✓</span> <span class="badge b-prog">Programme</span></td><td class="money">£36k</td><td><span class="pill p-warn">Proposal</span></td></tr>
+            <tr data-open="deal"><td><b>Halcyon Recruitment</b></td><td><span class="badge b-claudit">Claudit ✓</span> <span class="badge b-land">Land ✓</span> <span class="badge b-prog">Programme</span></td><td class="money">£33.5k</td><td><span class="pill p-neut">Business case</span></td></tr>
+            <tr data-open="deal"><td><b>Foldgate Foods</b></td><td><span class="badge b-prog">Programme ✓</span> <span class="badge b-ret">Retainer</span></td><td class="money">£84k ARR</td><td><span class="pill p-warn">Negotiation</span></td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- DEAL DETAIL -->
+    <section class="view" id="view-deal">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:10px"><span class="editnote">✎ Every field on this page is editable — click any value to change it</span></div>
+      <div class="detail">
+        <div>
+          <div class="dh">
+            <div class="logo">M</div>
+            <div style="flex:1">
+              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap"><h1 style="font-size:20px">Meridian Care Homes</h1><span class="badge b-prog">Programme</span></div>
+              <div class="sub" style="margin-top:5px">Care homes · 140 staff · Bristol · account value <b class="money">£36k</b> · sourced by <b style="color:var(--teal)">Sentinel</b> 🤝</div>
+              <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap">
+                <a class="linkr" href="#" onclick="return false"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M20.5 2h-17A1.5 1.5 0 0 0 2 3.5v17A1.5 1.5 0 0 0 3.5 22h17a1.5 1.5 0 0 0 1.5-1.5v-17A1.5 1.5 0 0 0 20.5 2M8 19H5v-9h3zM6.5 8.3a1.8 1.8 0 1 1 0-3.5 1.8 1.8 0 0 1 0 3.5M19 19h-3v-4.7c0-1.1-.4-1.9-1.4-1.9a1.5 1.5 0 0 0-1.4 1 2 2 0 0 0-.1.7V19h-3v-9h3v1.3a3 3 0 0 1 2.7-1.5c1.9 0 3.4 1.3 3.4 4z"/></svg>Priya's LinkedIn</a>
+                <a class="linkr" href="#" onclick="return false">🏢 Company site</a>
+              </div>
+            </div>
+          </div>
+          <div class="stage-track">
+            <div class="st done">Call booked</div><div class="st done">New biz mtg</div><div class="st done">Business case<small>qualified</small></div><div class="st cur">Proposal<small>sent</small></div><div class="st">Negotiation</div><div class="st">Closed Won</div>
+          </div>
+          <div class="tagrow"><span class="eyebrow" style="margin-right:2px">Tags</span><span class="dtag">🩺 Care sector</span><span class="dtag">🤝 Partner-sourced</span><span class="dtag">🔥 Q3 priority</span><span class="dtag add" data-toast="Opens a tag picker.">＋ Add tag</span></div>
+
+          <div class="sectionhead"><h2>Activity timeline</h2><span class="note">auto-logged · relative + exact date</span><div class="line"></div></div>
+          <div class="timeline">
+            <div class="tev stagechg"><div class="tdot"></div><div class="thd"><span class="tt">Stage → Proposal</span><span class="tm">2 days ago · 9 Aug 2026</span></div></div>
+            <div class="tev email"><div class="tdot"></div><div class="thd"><span class="tt">Proposal sent — Programme (12 leaders)</span><span class="tm">2 days ago · 9 Aug 2026</span></div><div class="tbody">Generated by Claude from the scoping call + pricing calculator. £34,000 · Professional × 12. Opened 4×.</div></div>
+            <div class="tev call"><div class="tdot"></div><div class="thd"><span class="tt">Business-case call — 58 min</span><span class="tm">6 days ago · 5 Aug 2026</span></div><div class="tbody"><b>AI summary:</b> COO (Priya) is economic buyer; pain = onboarding docs eat 4hrs/wk/coordinator; wants decision this quarter; procurement sign-off &gt;£30k.<a class="tlink" href="#" onclick="return false">▶ Open full transcript ↗</a></div></div>
+            <div class="tev dm"><div class="tdot"></div><div class="thd"><span class="tt">AI-drafted follow-up sent</span><span class="tm">11 days ago · 31 Jul 2026</span></div><div class="tbody ai">✳ Claude drafted from the audit transcript — recap of the 3 workflows + booking link. Edited lightly, sent.</div></div>
+            <div class="tev call"><div class="tdot"></div><div class="thd"><span class="tt">Free Claudit — 32 min</span><span class="tm">12 days ago · 30 Jul 2026</span></div><div class="tbody"><b>AI summary:</b> mapped current use vs potential; live-built a board-pack summariser. Flagged 3 build candidates.<a class="tlink" href="#" onclick="return false">▶ Open full transcript ↗</a></div></div>
+          </div>
+        </div>
+        <div class="rail">
+          <div class="card"><h3>Deal facts <span class="eyebrow">editable</span></h3>
+            <div class="kv"><span class="k">Type</span><span class="v"><select class="mini"><option>Claudit</option><option selected>Programme</option><option>Land</option><option>Retainer</option></select></span></div>
+            <div class="kv"><span class="k">Value</span><span class="v money edit" contenteditable="true">£34,000</span></div>
+            <div class="kv"><span class="k">Owner</span><span class="v"><select class="mini"><option selected>George Cairns</option><option>Joey Speed</option></select></span></div>
+            <div class="kv"><span class="k">Source</span><span class="v">Partner · Sentinel 🤝</span></div>
+            <div class="kv"><span class="k">Close target</span><span class="v edit" contenteditable="true">30 Sep 2026</span></div>
+          </div>
+          <div class="card"><h3>MEDDIC qualification <span class="eyebrow">4 / 6 known · editable</span></h3>
+            <div class="mscore"><div class="mscorebar"><span style="width:66%"></span></div><span class="tnum" style="font-size:12px;color:var(--muted)">66%</span></div>
+            <div class="meddic">
+              <div class="mrow"><div class="mstate m-known">✓</div><div><div class="ml">Metrics</div><div class="mv edit" contenteditable="true">4 hrs/wk/coordinator on onboarding docs</div></div></div>
+              <div class="mrow"><div class="mstate m-known">✓</div><div><div class="ml">Economic buyer</div><div class="mv edit" contenteditable="true">Priya N. — COO</div></div></div>
+              <div class="mrow"><div class="mstate m-part">~</div><div><div class="ml">Decision criteria</div><div class="mv edit" contenteditable="true">Output quality + team adoption (partial)</div></div></div>
+              <div class="mrow"><div class="mstate m-gap"></div><div><div class="ml">Decision process</div><div class="mv gap edit" contenteditable="true">Unknown — who signs off &gt;£30k?</div></div></div>
+              <div class="mrow"><div class="mstate m-known">✓</div><div><div class="ml">Identify pain</div><div class="mv edit" contenteditable="true">Onboarding docs; senior time on admin</div></div></div>
+              <div class="mrow"><div class="mstate m-part">~</div><div><div class="ml">Champion</div><div class="mv edit" contenteditable="true">Tom R. (Head of Ops) — warm, untested</div></div></div>
+            </div>
+            <button class="btn ai sm" style="width:100%; justify-content:center; margin-top:12px" data-toast="Claude scans transcripts to fill the gaps.">✳ Fill gaps from transcripts</button>
+          </div>
+          <div class="card"><h3>Commission</h3>
+            <div class="kv"><span class="k">Partner</span><span class="v">Sentinel · rev-split</span></div>
+            <div class="kv"><span class="k">Rate</span><span class="v edit" contenteditable="true">20%</span></div>
+            <div class="kv"><span class="k">Est. on win</span><span class="v money">£6,800</span></div>
+            <div class="kv"><span class="k">Status</span><span class="v"><span class="pill p-neut">Accrues on close</span></span></div>
+          </div>
+          <div class="card"><h3>✳ Do the work<span class="eyebrow">Claude</span></h3>
+            <div class="aiblock">
+              <button class="btn ai" data-toast="Claude drafts a follow-up from the latest transcript.">✉️ Draft follow-up from last call</button>
+              <button class="btn ai" data-toast="Claude generates a Programme proposal.">📄 Generate Programme proposal</button>
+              <button class="btn ai" data-toast="Claude drafts a LinkedIn DM to the champion.">👤 Draft LinkedIn DM to champion</button>
+            </div>
+          </div>
+          <div class="card"><h3>Collateral · Programme</h3>
+            <div class="asset" data-toast="Opens the Programme proposal template."><div class="fi" style="background:var(--good-soft)">📄</div><div><div class="an">Programme proposal template</div><div class="am">auto-fills deal data</div></div></div>
+            <div class="asset" data-toast="Opens the care-sector case study."><div class="fi" style="background:var(--teal-soft)">📊</div><div><div class="an">Care-sector case study</div><div class="am">PDF · matched</div></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLIENTS -->
+    <section class="view" id="view-clients">
+      <div class="callout"><span>🏢</span><div>A <b>Won</b> deal makes the company a <b>Client</b> — where sales hands to <b>delivery</b>. Click a row to open the account: revenue <b>and</b> delivery, contracts, satisfaction, testimonials.</div></div>
+      <div class="kpigrid g4" style="margin-bottom:6px">
+        <div class="card kpi"><div class="lab">Active clients</div><div class="val tnum">9</div><div class="foot">4 Programme · 3 Retainer · 2 Land</div></div>
+        <div class="card kpi"><div class="lab">Revenue under mgmt</div><div class="val tnum">£214<small>k</small></div><div class="foot">incl. £22k MRR retainers</div></div>
+        <div class="card kpi"><div class="lab">Avg. satisfaction</div><div class="val tnum">8.6<small>/10</small></div><div class="delta up tnum">▲ 0.4</div></div>
+        <div class="card kpi"><div class="lab">Expansion pipeline</div><div class="val tnum">£62<small>k</small></div><div class="foot">from existing clients</div></div>
+      </div>
+      <div class="sectionhead"><h2>Client roster</h2><span class="note">delivery + account management</span><div class="line"></div></div>
+      <div class="tbl tblscroll"><table>
+        <thead><tr><th>Client</th><th>Engagement</th><th>Closed to date</th><th>Delivery health</th><th>Satisfaction</th><th>Expansion</th></tr></thead>
+        <tbody>
+          <tr data-open="client"><td><b>Meridian Care Homes</b><div style="color:var(--faint);font-size:11px">Care · 140 staff</div></td><td><span class="badge b-prog">Programme</span></td><td class="money">£36k</td><td><span class="pill p-good">● On track</span></td><td><b class="tnum">9.1</b> <span style="color:var(--faint)">/10</span></td><td><span class="pill p-warn">Retainer scoping</span></td></tr>
+          <tr data-open="client"><td><b>Foldgate Foods</b><div style="color:var(--faint);font-size:11px">F&amp;B · 220 staff</div></td><td><span class="badge b-ret">Retainer</span></td><td class="money">£7k/mo</td><td><span class="pill p-good">● On track</span></td><td><b class="tnum">8.8</b> <span style="color:var(--faint)">/10</span></td><td><span class="pill p-neut">—</span></td></tr>
+          <tr data-open="client"><td><b>Sentinel Security</b><div style="color:var(--faint);font-size:11px">IT security · co-deliver</div></td><td><span class="badge b-prog">Programme</span></td><td class="money">£48k</td><td><span class="pill p-warn">● Watch — wk4 slip</span></td><td><b class="tnum">7.9</b> <span style="color:var(--faint)">/10</span></td><td><span class="pill p-warn">Phase 2 teams</span></td></tr>
+          <tr data-open="client"><td><b>Beacon HR Group</b><div style="color:var(--faint);font-size:11px">HR · 45 staff</div></td><td><span class="badge b-land">Land</span></td><td class="money">£8k</td><td><span class="pill p-bad">● At risk — quiet 3wks</span></td><td><b class="tnum">6.2</b> <span style="color:var(--faint)">/10</span></td><td><span class="pill p-neut">—</span></td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- CLIENT DETAIL -->
+    <section class="view" id="view-client">
+      <div class="dh"><div class="logo">M</div>
+        <div style="flex:1"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><h1 style="font-size:20px">Meridian Care Homes</h1><span class="pill p-good">● On track</span></div>
+          <div class="sub" style="margin-top:5px">Client since Jun 2026 · Programme (12 leaders) · account owner George · practitioner Joey</div></div>
+        <button class="btn sm" data-view="clients" data-nav>← All clients</button>
+      </div>
+      <div class="kpigrid g4" style="margin:18px 0">
+        <div class="card kpi"><div class="lab">Closed to date</div><div class="val tnum">£36<small>k</small></div><div class="foot">Claudit + Land + Programme</div></div>
+        <div class="card kpi"><div class="lab">Expansion pipeline</div><div class="val tnum">£60<small>k</small></div><div class="foot">Retainer · Scale · £5k MRR</div></div>
+        <div class="card kpi"><div class="lab">Coaching hrs used</div><div class="val tnum">14<small>/20</small></div><div class="foot">this month</div></div>
+        <div class="card kpi" style="display:flex; align-items:center"><div class="gauge"><svg class="ring" viewBox="0 0 36 36"><path d="M18 2a16 16 0 1 1 0 32 16 16 0 0 1 0-32" fill="none" stroke="var(--surface-2)" stroke-width="3.5"/><path d="M18 2a16 16 0 1 1 0 32 16 16 0 0 1 0-32" fill="none" stroke="var(--good)" stroke-width="3.5" stroke-dasharray="91 100" stroke-linecap="round"/></svg><div><div class="gt tnum">9.1</div><div class="gl">Satisfaction /10</div></div></div></div>
+      </div>
+      <div class="kpigrid g2">
+        <div>
+          <div class="sectionhead" style="margin-top:0"><h2>Delivery — capability progress</h2><span class="note">Foundations → Elite, per person</span><div class="line"></div></div>
+          <div class="card" style="padding:18px"><div class="prog">
+            <div class="pgrow"><span>Foundations</span><div class="pgbar"><span style="width:100%"></span></div><span class="pgn">12/12</span></div>
+            <div class="pgrow"><span>Build skills</span><div class="pgbar"><span style="width:75%"></span></div><span class="pgn">9/12</span></div>
+            <div class="pgrow"><span>Own / self-serve</span><div class="pgbar"><span style="width:42%"></span></div><span class="pgn">5/12</span></div>
+            <div class="pgrow"><span>Elite / champion</span><div class="pgbar"><span style="width:17%"></span></div><span class="pgn">2/12</span></div>
+          </div>
+          <div class="sectionhead"><h2>Sessions delivered</h2><div class="line"></div></div>
+          <div class="tbl"><table><thead><tr><th>Session</th><th>By</th><th>Date</th><th>Attend.</th></tr></thead><tbody>
+            <tr><td>Cohort call · wk 6</td><td>George</td><td>7 Aug 2026</td><td class="tnum">11/12</td></tr>
+            <tr><td>1:1 · Priya (COO)</td><td>Joey</td><td>5 Aug 2026</td><td class="tnum">✓</td></tr>
+            <tr><td>Build session · board pack</td><td>Joey</td><td>1 Aug 2026</td><td class="tnum">✓</td></tr>
+          </tbody></table></div>
+          </div>
+        </div>
+        <div>
+          <div class="sectionhead" style="margin-top:0"><h2>Relationship &amp; health</h2><div class="line"></div></div>
+          <div class="card" style="padding:16px">
+            <div class="kv"><span class="k">Last touchpoint</span><span class="v">Coaching call · 8 Aug 2026</span></div>
+            <div class="kv"><span class="k">Economic buyer</span><span class="v">Priya N. (COO) 🔗</span></div>
+            <div class="kv"><span class="k">Champion</span><span class="v champbar">Tom R. <span class="champtrack"><span style="width:80%"></span></span> 8.0</span></div>
+            <div class="kv"><span class="k">Quarterly review</span><span class="v">due 20 Sep 2026</span></div>
+            <div class="kv"><span class="k">Opportunity backlog</span><span class="v">4 workflows queued</span></div>
+          </div>
+          <div class="sectionhead"><h2>Proposals &amp; contracts</h2><div class="line"></div></div>
+          <div class="card" style="padding:14px">
+            <div class="asset" data-toast="Opens the signed Programme contract."><div class="fi" style="background:var(--good-soft)">📝</div><div><div class="an">Programme contract — signed</div><div class="am">£30k · Jun 2026</div></div></div>
+            <div class="asset" data-toast="Opens the retainer proposal (pending)."><div class="fi" style="background:var(--accent-soft)">📄</div><div><div class="an">Retainer proposal — Scale</div><div class="am">£5k MRR · pending</div></div></div>
+          </div>
+          <div class="sectionhead"><h2>Testimonials</h2><span class="note">also in Assets</span><div class="line"></div></div>
+          <div class="quote"><span class="ttype tt-written">Written</span> "The onboarding-doc build paid for the whole programme in the first month."<cite>— Priya N., COO · wk-6 review · 5 Aug 2026</cite></div>
+          <div class="quote"><span class="ttype tt-video">Video</span> 90-sec testimonial — Tom R. on the champion programme.<cite>— captured 7 Aug 2026 · <span style="color:var(--teal)">▶ watch ↗</span></cite></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STAKEHOLDERS -->
+    <section class="view" id="view-stakeholders">
+      <div class="callout"><span>👤</span><div>The database on every <b>individual</b> — prospects, buyers, champions — linked to their company and deals. Track a <b>champion score</b> so you can see who you're turning into an internal advocate, and how. Click a person to open their profile.</div></div>
+      <div class="filters">
+        <span class="chip on filt">All roles</span><span class="chip filt">Economic buyers</span><span class="chip filt">Champions</span><span class="chip filt">By company</span>
+        <div class="spacer"></div><button class="btn sm" data-toast="Would enrich from LinkedIn / Clay.">✳ Enrich from LinkedIn</button>
+      </div>
+      <div class="tbl tblscroll"><table>
+        <thead><tr><th>Person</th><th>Role</th><th>Company</th><th>Relationship</th><th>Champion score</th><th>Linked deals</th></tr></thead>
+        <tbody>
+          <tr data-open="stakeholder"><td><b>Priya N.</b><div style="color:var(--faint);font-size:11px">🔗 LinkedIn</div></td><td>COO</td><td>Meridian Care Homes</td><td><span class="pill p-blue">Economic buyer</span></td><td><span class="champbar"><span class="champtrack"><span style="width:72%"></span></span> 7.2</span></td><td>Programme £34k</td></tr>
+          <tr data-open="stakeholder"><td><b>Tom R.</b><div style="color:var(--faint);font-size:11px">🔗 LinkedIn</div></td><td>Head of Ops</td><td>Meridian Care Homes</td><td><span class="pill p-good">Champion</span></td><td><span class="champbar"><span class="champtrack"><span style="width:80%"></span></span> 8.0</span></td><td>Programme £34k</td></tr>
+          <tr data-open="stakeholder"><td><b>Dan Fold</b><div style="color:var(--faint);font-size:11px">🔗 LinkedIn</div></td><td>Ops Director</td><td>Foldgate Foods</td><td><span class="pill p-good">Champion</span></td><td><span class="champbar"><span class="champtrack"><span style="width:86%"></span></span> 8.6</span></td><td>Retainer £7k/mo</td></tr>
+          <tr data-open="stakeholder"><td><b>Aisha K.</b><div style="color:var(--faint);font-size:11px">🔗 LinkedIn</div></td><td>L&amp;D Lead</td><td>Halcyon Recruitment</td><td><span class="pill p-warn">Building</span></td><td><span class="champbar"><span class="champtrack"><span style="width:64%"></span></span> 6.4</span></td><td>Programme £31k</td></tr>
+          <tr data-open="stakeholder"><td><b>Priya's CFO — Raj</b><div style="color:var(--faint);font-size:11px">🔗 LinkedIn</div></td><td>CFO</td><td>Meridian Care Homes</td><td><span class="pill p-neut">Blocker / finance</span></td><td><span class="champbar"><span class="champtrack"><span style="width:30%"></span></span> 3.0</span></td><td>Programme £34k</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- STAKEHOLDER DETAIL -->
+    <section class="view" id="view-stakeholder">
+      <div class="dh"><div class="logo" style="color:var(--teal)">TR</div>
+        <div style="flex:1"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><h1 style="font-size:20px">Tom R.</h1><span class="pill p-good">Champion</span></div>
+          <div class="sub" style="margin-top:5px">Head of Ops · Meridian Care Homes · <a href="#" onclick="return false" style="color:var(--teal)">🔗 LinkedIn</a> · tom@meridiancare.co.uk</div></div>
+        <button class="btn sm" data-view="stakeholders" data-nav>← All stakeholders</button>
+      </div>
+      <div class="kpigrid g2" style="margin-top:18px">
+        <div>
+          <div class="card kpi" style="margin-bottom:14px"><div class="lab">Champion score — how strong an advocate</div>
+            <div class="gauge" style="margin-top:10px"><svg class="ring" viewBox="0 0 36 36"><path d="M18 2a16 16 0 1 1 0 32 16 16 0 0 1 0-32" fill="none" stroke="var(--surface-2)" stroke-width="3.5"/><path d="M18 2a16 16 0 1 1 0 32 16 16 0 0 1 0-32" fill="none" stroke="var(--good)" stroke-width="3.5" stroke-dasharray="80 100" stroke-linecap="round"/></svg>
+              <div><div class="gt tnum">8.0<small style="font-size:14px;color:var(--faint)">/10</small></div><div class="gl">↑ from 5.5 in Jun — trending up</div></div></div>
+          </div>
+          <div class="card" style="padding:16px"><h3 style="font-size:12.5px;margin-bottom:8px">What builds this score</h3>
+            <div class="prog">
+              <div class="pgrow"><span>Engagement</span><div class="pgbar"><span style="width:85%"></span></div><span class="pgn">8.5</span></div>
+              <div class="pgrow"><span>Advocacy</span><div class="pgbar"><span style="width:75%"></span></div><span class="pgn">7.5</span></div>
+              <div class="pgrow"><span>Influence / seniority</span><div class="pgbar"><span style="width:70%"></span></div><span class="pgn">7.0</span></div>
+              <div class="pgrow"><span>Capability progress</span><div class="pgbar"><span style="width:83%"></span></div><span class="pgn">8.3</span></div>
+            </div>
+            <div class="note" style="font-size:11px;color:var(--faint);margin-top:12px">Next step to strengthen → get Tom to co-run the wk-8 champion session.</div>
+          </div>
+        </div>
+        <div>
+          <div class="sectionhead" style="margin-top:0"><h2>Profile &amp; bank</h2><div class="line"></div></div>
+          <div class="card" style="padding:16px">
+            <div class="kv"><span class="k">Company</span><span class="v">Meridian Care Homes 🏢</span></div>
+            <div class="kv"><span class="k">Role in buying</span><span class="v">Champion (untested→proven)</span></div>
+            <div class="kv"><span class="k">Reports to</span><span class="v">Priya N. (COO)</span></div>
+            <div class="kv"><span class="k">Linked deals</span><span class="v">Programme £34k</span></div>
+            <div class="kv"><span class="k">Last contact</span><span class="v">Coaching call · 8 Aug 2026</span></div>
+            <div class="kv"><span class="k">Notes</span><span class="v edit" contenteditable="true">Ex-ops consultant. Cares about time-savings he can show the board.</span></div>
+          </div>
+          <div class="sectionhead"><h2>Recent activity</h2><div class="line"></div></div>
+          <div class="card" style="padding:6px 16px">
+            <div class="kv"><span class="k">📞 Coaching call</span><span class="v" style="color:var(--muted)">8 Aug 2026</span></div>
+            <div class="kv"><span class="k">✉️ Replied to follow-up</span><span class="v" style="color:var(--muted)">2 Aug 2026</span></div>
+            <div class="kv"><span class="k">🎥 Recorded testimonial</span><span class="v" style="color:var(--muted)">7 Aug 2026</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PARTNERS -->
+    <section class="view" id="view-partners">
+      <div class="callout"><span>🤝</span><div>A <b>primary revenue channel</b>. A partner's <b>personal link</b> is their unique referral + Claudit-booking URL — clicks and booked audits track to them automatically, and <b>commission accrues</b> per closed deal. Click a row to open the partner.</div></div>
+      <div class="kpigrid g4" style="margin-bottom:6px">
+        <div class="card kpi"><div class="lab">Active partners</div><div class="val tnum">7</div><div class="foot">3 Introduce · 2 Co-deliver · 2 Resell</div></div>
+        <div class="card kpi"><div class="lab">Partner-sourced pipeline</div><div class="val tnum">£146<small>k</small></div><div class="foot">40% of open pipeline</div></div>
+        <div class="card kpi"><div class="lab">Commission owed</div><div class="val tnum">£11.2<small>k</small></div><div class="foot">unpaid, accrued</div></div>
+        <div class="card kpi"><div class="lab">Commission paid YTD</div><div class="val tnum">£18.6<small>k</small></div><div class="foot">across 4 partners</div></div>
+      </div>
+      <div class="sectionhead"><h2>Partner roster</h2><div class="line"></div></div>
+      <div class="tbl tblscroll"><table>
+        <thead><tr><th>Partner</th><th>Model</th><th>Sourced</th><th>Open pipeline</th><th>Closed YTD</th><th>Commission owed</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr data-open="partner"><td><b>Sentinel Security</b><div style="color:var(--faint);font-size:11px">IT security reseller</div></td><td><span class="pill p-neut">Co-deliver</span></td><td class="tnum">5</td><td class="money">£79k</td><td class="money">£48k</td><td class="money">rev-split</td><td><span class="pill p-good">● Active</span></td></tr>
+          <tr data-open="partner"><td><b>Bright Path Advisory</b><div style="color:var(--faint);font-size:11px">Management consultancy</div></td><td><span class="pill p-neut">Introduce</span></td><td class="tnum">4</td><td class="money">£38k</td><td class="money">£14k</td><td class="money">£4.4k</td><td><span class="pill p-good">● Active</span></td></tr>
+          <tr data-open="partner"><td><b>Vantage Digital</b><div style="color:var(--faint);font-size:11px">Marketing agency</div></td><td><span class="pill p-neut">Resell</span></td><td class="tnum">2</td><td class="money">£30k</td><td class="money">£0</td><td class="money">margin</td><td><span class="pill p-warn">● Onboarding</span></td></tr>
+          <tr data-open="partner"><td><b>Ada Fenwick</b><div style="color:var(--faint);font-size:11px">Fractional COO</div></td><td><span class="pill p-neut">Introduce</span></td><td class="tnum">3</td><td class="money">£9k</td><td class="money">£0</td><td class="money">£6.8k</td><td><span class="pill p-good">● Active</span></td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- PARTNER DETAIL -->
+    <section class="view" id="view-partner">
+      <div class="dh"><div class="logo" style="color:var(--teal)">🤝</div>
+        <div style="flex:1"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><h1 style="font-size:20px">Sentinel Security</h1><span class="pill p-neut">Co-deliver</span><span class="pill p-good">● Active</span></div>
+          <div class="sub" style="margin-top:5px">IT security reseller · partner since Apr 2026 · rev-split · owner Joey</div></div>
+        <button class="btn sm" data-view="partners" data-nav>← All partners</button>
+      </div>
+      <div class="kpigrid g4" style="margin:18px 0">
+        <div class="card kpi"><div class="lab">Deals sourced</div><div class="val tnum">5</div></div>
+        <div class="card kpi"><div class="lab">Closed YTD</div><div class="val tnum">£48<small>k</small></div></div>
+        <div class="card kpi"><div class="lab">Commission owed</div><div class="val tnum">£3.4<small>k</small></div><div class="foot">accrued this quarter</div></div>
+        <div class="card kpi"><div class="lab">Link clicks → audits</div><div class="val tnum">31<small>→6</small></div></div>
+      </div>
+      <div class="kpigrid g2">
+        <div><div class="sectionhead" style="margin-top:0"><h2>Deals from this partner</h2><div class="line"></div></div>
+          <div class="tbl"><table><thead><tr><th>Company</th><th>Type</th><th>Value</th><th>Stage</th><th>Commission</th></tr></thead><tbody>
+            <tr data-open="deal"><td>Meridian Care Homes</td><td><span class="badge b-prog">Programme</span></td><td class="money">£34k</td><td><span class="pill p-warn">Proposal</span></td><td class="money">£6.8k*</td></tr>
+            <tr data-open="deal"><td>Halcyon Recruitment</td><td><span class="badge b-prog">Programme</span></td><td class="money">£31k</td><td><span class="pill p-neut">Business case</span></td><td class="money">£6.2k*</td></tr>
+            <tr data-open="deal"><td>Sentinel (internal)</td><td><span class="badge b-prog">Programme</span></td><td class="money">£48k</td><td><span class="pill p-good">Won</span></td><td class="money">split</td></tr>
+          </tbody></table></div>
+          <div class="note" style="font-size:11px;color:var(--faint);margin-top:8px">* accrues on close · paid to the schedule in their agreement</div>
+        </div>
+        <div><div class="sectionhead" style="margin-top:0"><h2>Partner details</h2><div class="line"></div></div>
+          <div class="card" style="padding:16px">
+            <div class="kv"><span class="k">Model</span><span class="v">Co-deliver · revenue split</span></div>
+            <div class="kv"><span class="k">Personal link</span><span class="v" style="color:var(--teal)">getaipowers.com/p/koncise</span></div>
+            <div class="kv"><span class="k">Link goes to</span><span class="v" style="font-size:11.5px">Claudit booking page, tagged to Sentinel</span></div>
+            <div class="kv"><span class="k">Main contact</span><span class="v">James O. 🔗</span></div>
+            <div class="kv"><span class="k">Last check-in</span><span class="v">Monthly · 3 Aug 2026</span></div>
+          </div>
+          <div class="sectionhead"><h2>Contracts &amp; agreements</h2><div class="line"></div></div>
+          <div class="card" style="padding:14px">
+            <div class="asset" data-toast="Opens the signed partner agreement."><div class="fi" style="background:var(--good-soft)">📝</div><div><div class="an">Partner agreement — signed</div><div class="am">Apr 2026 · rev-split terms</div></div></div>
+            <div class="asset" data-toast="Opens the co-signed client contract (Sentinel + Meridian)."><div class="fi" style="background:var(--teal-soft)">📝</div><div><div class="an">Co-signed: Meridian contract</div><div class="am">tri-party · Jun 2026</div></div></div>
+            <div class="asset" data-toast="Opens the partner enablement pack."><div class="fi" style="background:var(--accent-soft)">📑</div><div><div class="an">Partner enablement pack</div><div class="am">shared</div></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DELIVERY HUB -->
+    <section class="view" id="view-delivery">
+      <div class="callout"><span>🚚</span><div>Delivery health across every account — macro numbers up top, then <b>open any account</b> to see everything for that client: progress per person, sessions, hours, satisfaction, backlog. (This is the account-centric rework you asked for.)</div></div>
+      <div class="kpigrid g5" style="margin-bottom:6px">
+        <div class="card kpi"><div class="lab">Live engagements</div><div class="val tnum">6</div><div class="foot">4 Programme · 2 Retainer</div></div>
+        <div class="card kpi"><div class="lab">Sessions delivered (mo)</div><div class="val tnum">34</div><div class="foot">cohort + 1:1 + build</div></div>
+        <div class="card kpi"><div class="lab">Coaching hrs used</div><div class="val tnum">61<small>/80</small></div><div class="foot">76% of retained</div></div>
+        <div class="card kpi"><div class="lab">Avg. satisfaction</div><div class="val tnum">8.6<small>/10</small></div><div class="delta up tnum">▲ 0.4</div></div>
+        <div class="card kpi"><div class="lab">Accounts at risk</div><div class="val tnum">1</div><div class="foot">Beacon HR</div></div>
+      </div>
+
+      <div class="sectionhead"><h2>Accounts in delivery</h2><span class="note">click a card to open the full account</span><div class="line"></div></div>
+      <div class="kpigrid g2">
+        <div class="card" style="padding:16px; cursor:pointer" data-open="client">
+          <div style="display:flex;justify-content:space-between;align-items:center"><b>Meridian Care Homes</b><span class="pill p-good">● On track</span></div>
+          <div class="sub" style="font-size:12px;margin:3px 0 12px">Programme · 12 leaders · practitioner Joey</div>
+          <div class="prog">
+            <div class="pgrow"><span>Overall progress</span><div class="pgbar"><span style="width:59%"></span></div><span class="pgn">59%</span></div>
+            <div class="pgrow"><span>Coaching hrs</span><div class="pgbar"><span style="width:70%"></span></div><span class="pgn">14/20</span></div>
+          </div>
+          <div style="display:flex; gap:16px; margin-top:12px; font-size:11.5px; color:var(--muted)"><span>Sat <b class="tnum">9.1</b></span><span>Next: cohort wk7 · 12 Aug</span><span style="margin-left:auto;color:var(--teal);font-weight:600">Open account →</span></div>
+        </div>
+        <div class="card" style="padding:16px; cursor:pointer" data-open="client">
+          <div style="display:flex;justify-content:space-between;align-items:center"><b>Foldgate Foods</b><span class="pill p-good">● On track</span></div>
+          <div class="sub" style="font-size:12px;margin:3px 0 12px">Retainer · Scale tier · practitioner George</div>
+          <div class="prog">
+            <div class="pgrow"><span>Overall progress</span><div class="pgbar"><span style="width:71%"></span></div><span class="pgn">71%</span></div>
+            <div class="pgrow"><span>Coaching hrs</span><div class="pgbar"><span style="width:90%"></span></div><span class="pgn">18/20</span></div>
+          </div>
+          <div style="display:flex; gap:16px; margin-top:12px; font-size:11.5px; color:var(--muted)"><span>Sat <b class="tnum">8.8</b></span><span>Next: monthly review · 15 Aug</span><span style="margin-left:auto;color:var(--teal);font-weight:600">Open account →</span></div>
+        </div>
+        <div class="card" style="padding:16px; cursor:pointer" data-open="client">
+          <div style="display:flex;justify-content:space-between;align-items:center"><b>Sentinel Security</b><span class="pill p-warn">● Watch</span></div>
+          <div class="sub" style="font-size:12px;margin:3px 0 12px">Programme · co-deliver · practitioner Joey</div>
+          <div class="prog">
+            <div class="pgrow"><span>Overall progress</span><div class="pgbar"><span style="width:38%"></span></div><span class="pgn">38%</span></div>
+            <div class="pgrow"><span>Coaching hrs</span><div class="pgbar"><span style="width:60%"></span></div><span class="pgn">12/20</span></div>
+          </div>
+          <div style="display:flex; gap:16px; margin-top:12px; font-size:11.5px; color:var(--muted)"><span>Sat <b class="tnum">7.9</b></span><span style="color:var(--warn)">⚠ wk4 slip — behind plan</span><span style="margin-left:auto;color:var(--teal);font-weight:600">Open account →</span></div>
+        </div>
+        <div class="card" style="padding:16px; cursor:pointer; border-color:var(--bad-soft)" data-open="client">
+          <div style="display:flex;justify-content:space-between;align-items:center"><b>Beacon HR Group</b><span class="pill p-bad">● At risk</span></div>
+          <div class="sub" style="font-size:12px;margin:3px 0 12px">Land + Setup · practitioner George</div>
+          <div class="prog">
+            <div class="pgrow"><span>Overall progress</span><div class="pgbar"><span style="width:22%"></span></div><span class="pgn">22%</span></div>
+            <div class="pgrow"><span>Coaching hrs</span><div class="pgbar"><span style="width:20%"></span></div><span class="pgn">4/20</span></div>
+          </div>
+          <div style="display:flex; gap:16px; margin-top:12px; font-size:11.5px; color:var(--muted)"><span>Sat <b class="tnum">6.2</b></span><span style="color:var(--bad)">⚠ quiet 3 weeks — reach out</span><span style="margin-left:auto;color:var(--teal);font-weight:600">Open account →</span></div>
+        </div>
+      </div>
+
+      <div class="sectionhead"><h2>Team capacity — sessions by practitioner</h2><span class="note">this month</span><div class="line"></div></div>
+      <div class="card" style="padding:18px"><div class="prog">
+        <div class="pgrow"><span>George — cohort</span><div class="pgbar"><span style="width:100%"></span></div><span class="pgn">18</span></div>
+        <div class="pgrow"><span>Joey — 1:1 + build</span><div class="pgbar"><span style="width:67%"></span></div><span class="pgn">12</span></div>
+        <div class="pgrow"><span>Guest practitioner</span><div class="pgbar"><span style="width:22%"></span></div><span class="pgn">4</span></div>
+      </div></div>
+    </section>
+
+    <!-- CONTENT -->
+    <section class="view" id="view-content">
+      <div class="callout"><span>✍️</span><div>Anyone drops an idea here → <b>Draft with Claude</b> writes it in your voice → published posts link to the deals they sourced. Performance lives in <b>Content analytics</b>.</div></div>
+      <div class="filters" style="margin-top:16px">
+        <span class="chip on filt">All channels</span><span class="chip filt">LinkedIn</span><span class="chip filt">Instagram</span><span class="chip filt">TikTok</span>
+        <span class="chip filt">Informative</span><span class="chip filt">Storytelling</span><span class="chip filt">Personal</span>
+        <div class="spacer"></div><button class="btn ai sm" data-toast="Opens a new content idea card.">＋ New idea</button>
+      </div>
+      <div class="cboard">
+        <div class="cbcol"><div class="colhead"><div class="ctline"><div class="ct"><span class="dot" style="background:var(--faint)"></span>Ideas</div><div class="cv">8</div></div></div>
+          <div class="cpost"><div class="ct">"You're using 1/10th of what you pay Claude for"</div><div class="cm"><span class="chan ch-li">LinkedIn</span><span class="cattag cat-info">Informative</span><span class="mini-av av-j">J</span></div><button class="btn ai sm" style="width:100%; justify-content:center" data-toast="Claude drafts this post in your voice.">✳ Draft with Claude</button></div>
+          <div class="cpost"><div class="ct">Why an April skill breaks by August</div><div class="cm"><span class="chan ch-li">LinkedIn</span><span class="cattag cat-info">Informative</span><span class="mini-av av-g">G</span></div><button class="btn ai sm" style="width:100%; justify-content:center" data-toast="Claude drafts this post in your voice.">✳ Draft with Claude</button></div>
+        </div>
+        <div class="cbcol"><div class="colhead"><div class="ctline"><div class="ct"><span class="dot" style="background:var(--accent)"></span>Drafted</div><div class="cv">5</div></div></div>
+          <div class="cpost"><div class="ct">Care home saved 6 hrs/week on onboarding docs</div><div class="cm"><span class="chan ch-li">LinkedIn</span><span class="cattag cat-story">Storytelling</span><span class="pill p-warn" style="font-size:10px">Review</span></div></div>
+          <div class="cpost"><div class="ct">The 4 questions that tell you a company's ready</div><div class="cm"><span class="chan ch-ig">Instagram</span><span class="cattag cat-info">Informative</span><span class="pill p-warn" style="font-size:10px">Review</span></div></div>
+        </div>
+        <div class="cbcol"><div class="colhead"><div class="ctline"><div class="ct"><span class="dot" style="background:var(--good)"></span>Published</div><div class="cv">11</div></div></div>
+          <div class="cpost"><div class="ct">MEDDIC, but for buying AI enablement</div><div class="cm"><span class="chan ch-li">LinkedIn</span><span class="cattag cat-info">Informative</span></div><div class="metrics-mini"><span>👁 4.2k</span><span>♥ 210</span><span>💬 34</span></div><div class="cm"><span class="pill p-good" style="font-size:10px">↳ sourced £28k</span></div></div>
+          <div class="cpost"><div class="ct">"We turned Claude on and nobody used it."</div><div class="cm"><span class="chan ch-li">LinkedIn</span><span class="cattag cat-personal">Personal</span></div><div class="metrics-mini"><span>👁 2.9k</span><span>♥ 180</span><span>💬 41</span></div><div class="cm"><span class="pill p-good" style="font-size:10px">↳ sourced 2 deals</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ANALYTICS -->
+    <section class="view" id="view-analytics">
+      <div class="callout"><span>📈</span><div><b>Real reach on every post</b> (views, likes, comments), tagged by <b>content type</b> so you learn what works. <span class="flag">Needs a source</span> post metrics come from a social-scheduler API or manual entry — see Architecture.</div></div>
+      <div class="kpigrid g4" style="margin-bottom:6px">
+        <div class="card kpi"><div class="lab">Total reach (30d)</div><div class="val tnum">41.2<small>k</small></div><div class="delta up tnum">▲ 18%</div></div>
+        <div class="card kpi"><div class="lab">Avg. engagement</div><div class="val tnum">4.8<small>%</small></div><div class="delta up tnum">▲ 0.6</div></div>
+        <div class="card kpi"><div class="lab">Content-sourced deals</div><div class="val tnum">£56<small>k</small></div><div class="foot">7 deals attributed</div></div>
+        <div class="card kpi"><div class="lab">Best type</div><div class="val" style="font-size:18px;color:var(--accent-ink)">Storytelling</div><div class="foot">2.1× avg engagement</div></div>
+      </div>
+      <div class="sectionhead"><h2>What works — by content type</h2><div class="line"></div></div>
+      <div class="card"><div class="bars">
+        <div class="barrow"><span>Storytelling</span><div class="bartrack"><span class="bt-story" style="width:88%"></span></div><span class="pgn">6.4%</span></div>
+        <div class="barrow"><span>Personal</span><div class="bartrack"><span class="bt-personal" style="width:64%"></span></div><span class="pgn">4.7%</span></div>
+        <div class="barrow"><span>Informative</span><div class="bartrack"><span class="bt-info" style="width:41%"></span></div><span class="pgn">3.0%</span></div>
+      </div></div>
+      <div class="sectionhead"><h2>Top posts</h2><div class="line"></div></div>
+      <div class="tbl tblscroll"><table>
+        <thead><tr><th>Post</th><th>Channel</th><th>Type</th><th>Views</th><th>Likes</th><th>Comments</th><th>Sourced</th></tr></thead>
+        <tbody>
+          <tr><td>Care home saved 6 hrs/week…</td><td><span class="chan ch-li">LinkedIn</span></td><td><span class="cattag cat-story">Story</span></td><td class="tnum">6.8k</td><td class="tnum">340</td><td class="tnum">52</td><td class="money">£28k</td></tr>
+          <tr><td>MEDDIC, but for buying AI…</td><td><span class="chan ch-li">LinkedIn</span></td><td><span class="cattag cat-info">Info</span></td><td class="tnum">4.2k</td><td class="tnum">210</td><td class="tnum">34</td><td class="money">£28k</td></tr>
+          <tr><td>"We turned Claude on and nobody…"</td><td><span class="chan ch-li">LinkedIn</span></td><td><span class="cattag cat-personal">Personal</span></td><td class="tnum">2.9k</td><td class="tnum">180</td><td class="tnum">41</td><td class="money">2 deals</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- ASSETS -->
+    <section class="view" id="view-assets">
+      <div class="callout"><span>📎</span><div>Every commercial asset, tagged by <b>deal rung</b>, so the right collateral surfaces on any deal. Plus a <b>proposals bank</b> and a one-click <b>testimonials library</b>.</div></div>
+      <div class="filters"><span class="chip on filt">All</span><span class="chip filt">Claudit</span><span class="chip filt">Land</span><span class="chip filt">Programme</span><span class="chip filt">Retainer</span>
+        <div class="spacer"></div><button class="btn sm" id="testiBtn">🗣️ View all testimonials</button></div>
+      <div class="kpigrid g3">
+        <div class="card" style="padding:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="badge b-claudit">Claudit</span><span class="eyebrow">4 assets</span></div>
+          <div class="asset" data-toast="Opens the audit framework."><div class="fi" style="background:var(--teal-soft)">📊</div><div><div class="an">Audit framework &amp; scorecard</div><div class="am">used 20×</div></div></div>
+          <div class="asset" data-toast="Opens the audit DM template."><div class="fi" style="background:var(--accent-soft)">✉️</div><div><div class="an">"Book your Claudit" DM template</div><div class="am">reply rate 14%</div></div></div>
+        </div>
+        <div class="card" style="padding:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="badge b-land">Land</span><span class="eyebrow">3 assets</span></div>
+          <div class="asset" data-toast="Opens the build-credit SOW."><div class="fi" style="background:var(--good-soft)">📄</div><div><div class="an">Build-credit SOW template</div><div class="am">Docs</div></div></div>
+          <div class="asset" data-toast="Opens the Land proposal email."><div class="fi" style="background:var(--accent-soft)">✉️</div><div><div class="an">Land proposal email</div><div class="am">template</div></div></div>
+        </div>
+        <div class="card" style="padding:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="badge b-prog">Programme</span> <span class="badge b-ret">Retainer</span></div>
+          <div class="asset" data-toast="Opens the Programme proposal."><div class="fi" style="background:var(--good-soft)">📄</div><div><div class="an">Programme proposal (per-head)</div><div class="am">Docs</div></div></div>
+          <div class="asset" data-toast="Opens the retainer deck."><div class="fi" style="background:var(--plum-soft)">📑</div><div><div class="an">Retainer offering deck 2026</div><div class="am">PDF · 12pp</div></div></div>
+        </div>
+      </div>
+      <div class="sectionhead"><h2>Plugins &amp; skills · client Claude setup</h2><span class="note">downloadable delivery IP — stand up a client's Claude fast</span><div class="line"></div></div>
+      <div class="kpigrid g3">
+        <div class="card" style="padding:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="badge b-claudit">Templates</span></div>
+          <div class="asset" data-toast="Downloads the Claude Brain starter template."><div class="fi" style="background:var(--teal-soft)">🧠</div><div><div class="an">Claude Brain starter template</div><div class="am">⭳ seeds a client's Brain</div></div></div>
+          <div class="asset" data-toast="Downloads the environment setup checklist."><div class="fi" style="background:var(--surface-3)">✅</div><div><div class="an">Environment setup checklist</div><div class="am">⭳ Docs</div></div></div>
+        </div>
+        <div class="card" style="padding:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="badge b-prog">Skill packs</span></div>
+          <div class="asset" data-toast="Downloads the onboarding-doc skill."><div class="fi" style="background:var(--good-soft)">📎</div><div><div class="an">Onboarding-doc skill</div><div class="am">⭳ used at Meridian</div></div></div>
+          <div class="asset" data-toast="Downloads the board-pack summariser skill."><div class="fi" style="background:var(--accent-soft)">📎</div><div><div class="an">Board-pack summariser skill</div><div class="am">⭳ finance teams</div></div></div>
+          <div class="asset" data-toast="Downloads the brand-voice skill pack."><div class="fi" style="background:var(--violet-soft)">📎</div><div><div class="an">Brand-voice skill pack</div><div class="am">⭳ writes as the client</div></div></div>
+        </div>
+        <div class="card" style="padding:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="badge b-ret">Playbooks</span></div>
+          <div class="asset" data-toast="Downloads the connectors setup guide."><div class="fi" style="background:var(--plum-soft)">🔌</div><div><div class="an">Connectors setup guide</div><div class="am">⭳ email · files · calendar</div></div></div>
+          <div class="asset" data-toast="Downloads the champion programme kit."><div class="fi" style="background:var(--teal-soft)">🏅</div><div><div class="an">Champion programme kit</div><div class="am">⭳ grow internal champions</div></div></div>
+        </div>
+      </div>
+
+      <div class="sectionhead"><h2>Previous proposals</h2><span class="note">a searchable bank of everything sent</span><div class="line"></div></div>
+      <div class="tbl tblscroll"><table>
+        <thead><tr><th>Proposal</th><th>Client</th><th>Rung</th><th>Value</th><th>Sent</th><th>Outcome</th></tr></thead>
+        <tbody>
+          <tr data-toast="Opens the sent proposal."><td>Programme · 12 leaders</td><td>Meridian Care Homes</td><td><span class="badge b-prog">Programme</span></td><td class="money">£34k</td><td>9 Aug 2026</td><td><span class="pill p-warn">Awaiting</span></td></tr>
+          <tr data-toast="Opens the sent proposal."><td>Retainer · Scale</td><td>Foldgate Foods</td><td><span class="badge b-ret">Retainer</span></td><td class="money">£7k/mo</td><td>4 Aug 2026</td><td><span class="pill p-warn">Negotiating</span></td></tr>
+          <tr data-toast="Opens the sent proposal."><td>Programme · co-deliver</td><td>Sentinel Security</td><td><span class="badge b-prog">Programme</span></td><td class="money">£48k</td><td>Jun 2026</td><td><span class="pill p-good">Won</span></td></tr>
+          <tr data-toast="Opens the sent proposal."><td>Build credit · onboarding</td><td>Halcyon Recruitment</td><td><span class="badge b-land">Land</span></td><td class="money">£2.5k</td><td>May 2026</td><td><span class="pill p-good">Won</span></td></tr>
+        </tbody>
+      </table></div>
+      <div class="sectionhead"><h2>Testimonials library</h2><span class="note">written · video · docs — who, when</span><div class="line"></div></div>
+      <div class="tbl tblscroll"><table>
+        <thead><tr><th>Testimonial</th><th>Type</th><th>From</th><th>Client</th><th>Date</th></tr></thead>
+        <tbody>
+          <tr data-toast="Opens the testimonial."><td>"Paid for the programme in month one"</td><td><span class="ttype tt-written">Written</span></td><td>Priya N. (COO)</td><td>Meridian Care Homes</td><td>5 Aug 2026</td></tr>
+          <tr data-toast="Plays the video testimonial."><td>90-sec champion-programme testimonial</td><td><span class="ttype tt-video">Video</span></td><td>Tom R. (Head of Ops)</td><td>Meridian Care Homes</td><td>7 Aug 2026</td></tr>
+          <tr data-toast="Opens the case-study doc."><td>Recruitment throughput case study</td><td><span class="ttype tt-doc">Doc</span></td><td>Halcyon leadership</td><td>Halcyon Recruitment</td><td>Jul 2026</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- SCHEMA -->
+    <section class="view" id="view-schema">
+      <div class="callout"><span>✳</span><div>The data spine. Each is an Airtable <b>table</b>; teal fields are <b>links</b>. Get this right and every screen falls out for free. See <b>Architecture</b> for how outside tools feed it.</div></div>
+      <div class="schema">
+        <div class="entity core"><div class="eh">🏢 Companies</div><ul><li>Name<span class="ty">text</span></li><li>Industry · size<span class="ty">select</span></li><li>Lifecycle<span class="ty">prospect→client</span></li><li class="link">↳ Deals<span class="ty">link</span></li><li class="link">↳ Stakeholders<span class="ty">link</span></li><li>Account value<span class="ty">rollup</span></li></ul></div>
+        <div class="entity core"><div class="eh">🎯 Deals <span class="eyebrow" style="margin-left:auto">per rung</span></div><ul><li>Type<span class="ty">Claudit…Retainer</span></li><li>Stage<span class="ty">select</span></li><li>Value / MRR<span class="ty">£</span></li><li>MEDDIC + tags<span class="ty">group</span></li><li class="link">↳ Company<span class="ty">link</span></li><li class="link">↳ Partner (src)<span class="ty">link</span></li></ul></div>
+        <div class="entity core"><div class="eh">👤 Stakeholders</div><ul><li>Name / role<span class="ty">text</span></li><li>LinkedIn<span class="ty">url</span></li><li>Buying role<span class="ty">select</span></li><li>Champion score<span class="ty">number</span></li><li class="link">↳ Company · Deals<span class="ty">link</span></li><li class="link">↳ Activities<span class="ty">link</span></li></ul></div>
+        <div class="entity core"><div class="eh">⚡ Activities</div><ul><li>Type<span class="ty">call·email·DM</span></li><li>Transcript + summary<span class="ty">long text</span></li><li>Transcript link<span class="ty">url</span></li><li class="link">↳ Stakeholder · Deal<span class="ty">link</span></li></ul></div>
+        <div class="entity"><div class="eh">🎯 Prospects</div><ul><li>Industry · size<span class="ty">select</span></li><li>Status<span class="ty">new…converted</span></li><li>From Clay/Apollo<span class="ty">import</span></li><li class="link">↳ becomes Company<span class="ty">link</span></li></ul></div>
+        <div class="entity"><div class="eh">🚚 Delivery</div><ul><li>Sessions · hrs<span class="ty">number</span></li><li>Progress tracker<span class="ty">rollup</span></li><li>Satisfaction<span class="ty">number</span></li><li class="link">↳ Client<span class="ty">link</span></li></ul></div>
+        <div class="entity"><div class="eh">🤝 Partners</div><ul><li>Model · link<span class="ty">select·url</span></li><li>Commission %<span class="ty">number</span></li><li class="link">↳ Deals sourced<span class="ty">link</span></li><li>Owed · paid<span class="ty">rollup</span></li></ul></div>
+        <div class="entity"><div class="eh">✍️ Content · 📎 Assets</div><ul><li>Type · channel<span class="ty">select</span></li><li>Views·likes·comments<span class="ty">number</span></li><li>Testimonial type<span class="ty">select</span></li><li class="link">↳ Deals sourced<span class="ty">link</span></li></ul></div>
+      </div>
+      <div class="relnote"><b>Reading it:</b> a <b>Prospect</b> becomes a <b>Company</b> when it engages; a Company has many <b>Deals</b> (one per rung) and <b>Stakeholders</b> (each with a champion score); a Won deal spins up <b>Delivery</b>. Every Activity, Deal &amp; Content piece points at what sourced it — the basis of attribution &amp; commission.</div>
+    </section>
+
+    <!-- ARCH -->
+    <section class="view" id="view-arch">
+      <div class="callout"><span>🔌</span><div>How it all connects. <b>Everything flows into one spine (Airtable)</b> — the tools in layer 1 are swappable without touching the CRM. Goal: <b>you touch it as little as possible</b>; the plumbing keeps it live.</div></div>
+      <div class="layers">
+        <div class="layer"><div class="lh"><div class="lnum">1</div><div><div class="lt">Sources — where the work happens</div><div class="ld">interchangeable · pick best-in-class, swap any time</div></div></div>
+          <div class="nodes"><span class="node">💼 LinkedIn tool <span class="swap">swap</span></span><span class="node">🔎 Clay / Apollo <span class="swap">swap</span></span><span class="node">✉️ Google Workspace</span><span class="node">📅 Calendly</span><span class="node">🎙️ Call transcription <span class="swap">swap</span></span><span class="node">📣 Social scheduler</span><span class="node">👥 Circle</span></div>
+        </div>
+        <div class="flowdown">↓ feeds ↓</div>
+        <div class="layer"><div class="lh"><div class="lnum">2</div><div><div class="lt">Connect — how data gets in</div><div class="ld">preference order: native → automation bridge → API/webhook → manual</div></div></div>
+          <div class="nodes"><span class="node">🔗 Native integrations</span><span class="node">⚙️ Make / Zapier / n8n</span><span class="node">{ } REST API &amp; webhooks</span><span class="node">✍️ Manual (some)</span></div>
+        </div>
+        <div class="flowdown">↓ writes to ↓</div>
+        <div class="layer spine"><div class="lh"><div class="lnum">3</div><div><div class="lt">The Spine — single source of truth (Airtable)</div><div class="ld">tools don't own the data; this does. Swap a tool, only the connector changes.</div></div></div>
+          <div class="nodes"><span class="node tbl2">🏢 Companies</span><span class="node tbl2">🎯 Deals</span><span class="node tbl2">👤 Stakeholders</span><span class="node tbl2">⚡ Activities</span><span class="node tbl2">🎯 Prospects</span><span class="node tbl2">🚚 Delivery</span><span class="node tbl2">🤝 Partners</span><span class="node tbl2">✍️ Content</span></div>
+        </div>
+        <div class="flowdown">↓ powered by ↓</div>
+        <div class="layer"><div class="lh"><div class="lnum">4</div><div><div class="lt">Automation + AI — the logic on top</div><div class="ld">Airtable automations for triggers · Claude (API) for the smart work</div></div></div>
+          <div class="nodes"><span class="node">↦ Booking → new deal</span><span class="node">✳ Transcript → summary</span><span class="node">✳ Draft follow-up</span><span class="node">✳ Generate proposal</span><span class="node">Σ Commission roll-up</span><span class="node">⏰ Reminders</span></div>
+        </div>
+        <div class="flowdown">↓ surfaced as ↓</div>
+        <div class="layer"><div class="lh"><div class="lnum">5</div><div><div class="lt">Surface — what you use</div><div class="ld">Airtable Interfaces — the screens in this prototype. Nothing lives here; it's all views of the spine.</div></div></div>
+          <div class="nodes"><span class="node">📊 Dashboard</span><span class="node">🎯 Prospects</span><span class="node">▦ Pipeline</span><span class="node">🏢 Clients</span><span class="node">🚚 Delivery</span><span class="node">🤝 Partners</span></div>
+        </div>
+      </div>
+      <div class="relnote" style="margin-top:16px"><b class="flag">Honest limits</b> &nbsp; Two things hit platform walls: <b>pulling LinkedIn profiles / capturing manual DMs</b> (LinkedIn's API is locked — route via Clay or the LinkedIn tool's export), and <b>post analytics</b> (from a social-scheduler API or manual). Everything else is standard plumbing.</div>
+    </section>
+
+  </div>
+</div>
+
+<!-- NEW DEAL MODAL -->
+<div class="overlay" id="dealModal">
+  <div class="modal">
+    <div class="mh"><h2>New deal</h2><button class="iconbtn" id="modalClose">✕</button></div>
+    <div class="mb">
+      <div class="fld full"><label>Company</label><input placeholder="Search or create a company…" value="Apex Talent"></div>
+      <div class="fld"><label>Deal type</label><select><option>Claudit</option><option>Land</option><option selected>Programme</option><option>Retainer</option></select></div>
+      <div class="fld"><label>Value / MRR</label><input placeholder="£" value="£28,000"></div>
+      <div class="fld"><label>Stage</label><select><option selected>Call booked</option><option>New biz meeting</option><option>Business case</option><option>Proposal</option><option>Negotiation</option></select></div>
+      <div class="fld"><label>Source</label><select><option>Prospect / outbound</option><option>Content</option><option selected>Partner</option><option>Inbound</option><option>Expansion</option></select></div>
+      <div class="fld"><label>Owner</label><select><option>Joey Speed</option><option selected>George Cairns</option></select></div>
+      <div class="fld"><label>Close target</label><input type="text" value="30 Sep 2026"></div>
+    </div>
+    <div class="mf"><button class="btn" id="modalCancel">Cancel</button><button class="btn primary" id="modalSave">Create deal</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="tk">Prototype</span><span id="toastMsg"></span></div>
+
+<script>
+  const links=document.querySelectorAll('.navlink'), views=document.querySelectorAll('.view');
+  const titles={revenue:['Overview','Revenue Room'],dashboard:['Overview','Sales analytics'],prospects:['Sales','Prospects'],prospect:['Sales › Prospect','Jordan Mills'],pipeline:['Sales','Pipeline'],deal:['Sales › Deal','Meridian Care Homes'],clients:['Accounts','Clients'],client:['Accounts › Client','Meridian Care Homes'],stakeholders:['Accounts','Stakeholders'],stakeholder:['Accounts › Person','Tom R.'],partners:['Accounts','Partners'],partner:['Accounts › Partner','Sentinel Security'],delivery:['Delivery','Delivery hub'],content:['Marketing','Content bank'],analytics:['Marketing','Content analytics'],assets:['Reference','Assets & proposals'],schema:['Reference','Data model'],arch:['Reference','Architecture']};
+  function show(v){views.forEach(s=>s.classList.toggle('active', s.id==='view-'+v)); links.forEach(l=>l.classList.toggle('active', l.dataset.view===v)); if(titles[v]){document.getElementById('crumb').textContent=titles[v][0];document.getElementById('ptitle').textContent=titles[v][1];} window.scrollTo({top:0});}
+  links.forEach(l=>l.addEventListener('click',()=>show(l.dataset.view)));
+  document.querySelectorAll('[data-nav]').forEach(d=>d.addEventListener('click',()=>show(d.dataset.view)));
+
+  const toast=document.getElementById('toast'), toastMsg=document.getElementById('toastMsg'); let tT;
+  function ping(msg){toastMsg.textContent=msg; toast.classList.add('show'); clearTimeout(tT); tT=setTimeout(()=>toast.classList.remove('show'),2800);}
+
+  // row/card open — but not when clicking a button/select/link/editable inside
+  document.querySelectorAll('[data-open]').forEach(d=>d.addEventListener('click',e=>{
+    if(e.target.closest('button, select, a, .edit, [data-toast]')) return;
+    show(d.dataset.open);
+  }));
+  document.querySelectorAll('[data-toast]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation(); ping(el.dataset.toast);}));
+
+  document.querySelectorAll('.chip.filt').forEach(c=>c.addEventListener('click',()=>c.classList.toggle('on')));
+  document.querySelectorAll('.seg').forEach(seg=>{if(seg.id==='pipeSeg'||seg.id==='rangeSeg')return; seg.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{seg.querySelectorAll('button').forEach(x=>x.classList.remove('on')); b.classList.add('on');}));});
+
+  // pipeline view toggle
+  const pipeSeg=document.getElementById('pipeSeg');
+  pipeSeg.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    pipeSeg.querySelectorAll('button').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+    const p=b.dataset.p;
+    document.getElementById('pipeBoard').hidden = p!=='Board';
+    document.getElementById('pipeTable').hidden = p!=='Table';
+    document.getElementById('pipeAccount').hidden = p!=='Account';
+  }));
+
+  // time rescale
+  const rangeSeg=document.getElementById('rangeSeg'); const scalables=document.querySelectorAll('[data-base]');
+  function rescale(f){scalables.forEach(el=>{const v=Math.round(+el.dataset.base*f); el.textContent=v.toLocaleString('en-GB')+(el.dataset.suffix||'');});}
+  rangeSeg.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{rangeSeg.querySelectorAll('button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); rescale(+b.dataset.f);}));
+
+  // capacity planner
+  const range=document.getElementById('targetRange'); const revPerDM=111, postsPerClient=4.5, avgDeal=17750, meetToWin=.28;
+  function fmt(n){return n.toLocaleString('en-GB')}
+  function plan(){const target=+range.value*1000; document.getElementById('targetVal').textContent='£'+(+range.value>=1000?'1m':(+range.value+'k')); const dms=Math.round(target/revPerDM), clients=Math.max(1,Math.round(target/avgDeal)); document.getElementById('needDMs').textContent=fmt(dms); document.getElementById('needPosts').textContent=fmt(Math.round(clients*postsPerClient)); document.getElementById('needMeetings').textContent=fmt(Math.round(clients/meetToWin)); document.getElementById('needHeads').textContent=(dms/1000).toFixed(1);}
+  range.addEventListener('input',plan); plan();
+
+  // drag & drop
+  let dragged=null;
+  document.querySelectorAll('.deal[draggable]').forEach(d=>{
+    d.addEventListener('dragstart',()=>{dragged=d; d.classList.add('dragging');});
+    d.addEventListener('dragend',()=>{dragged&&dragged.classList.remove('dragging'); dragged=null; document.querySelectorAll('.cards').forEach(c=>c.classList.remove('dragover'));});
+  });
+  document.querySelectorAll('.cards[data-col]').forEach(col=>{
+    col.addEventListener('dragover',e=>{e.preventDefault(); col.classList.add('dragover');});
+    col.addEventListener('dragleave',()=>col.classList.remove('dragover'));
+    col.addEventListener('drop',e=>{e.preventDefault(); if(dragged){col.appendChild(dragged); ping('Deal moved — in the real build this updates its stage & logs the change.');} col.classList.remove('dragover');});
+  });
+
+  // editable → toast on blur (once)
+  document.querySelectorAll('.edit').forEach(el=>el.addEventListener('blur',()=>ping('Saved — every field writes straight to the record.')));
+
+  // modal
+  const modal=document.getElementById('dealModal');
+  function openModal(){modal.classList.add('show');}
+  function closeModal(){modal.classList.remove('show');}
+  document.getElementById('newDealBtn').addEventListener('click',openModal);
+  const nd2=document.getElementById('newDealBtn2'); if(nd2) nd2.addEventListener('click',openModal);
+  document.getElementById('modalClose').addEventListener('click',closeModal);
+  document.getElementById('modalCancel').addEventListener('click',closeModal);
+  document.getElementById('modalSave').addEventListener('click',()=>{closeModal(); ping('Deal created — added to Pipeline at "Call booked".');});
+  modal.addEventListener('click',e=>{if(e.target===modal)closeModal();});
+  document.getElementById('testiBtn').addEventListener('click',()=>ping('Jumping to the testimonials library below ↓'));
+
+  // ---- Revenue Room ----
+  (function(){
+    const past=[{m:'Mar',mrr:12,proj:18},{m:'Apr',mrr:14,proj:22},{m:'May',mrr:16,proj:28},{m:'Jun',mrr:19,proj:24},{m:'Jul',mrr:20,proj:35},{m:'Aug',mrr:22,proj:40}];
+    const futM=['Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'];
+    const projBase=[34,28,20,25,18,22,20,24,19,26,21,23];
+    const newMRRbase=3;
+    const chart=document.getElementById('revChart');
+    const convR=document.getElementById('convRange'), churnR=document.getElementById('churnRange');
+    if(!chart||!convR) return;
+    function build(conv,churn){
+      const d=past.map(p=>({m:p.m,mrr:p.mrr,proj:p.proj,f:false}));
+      let mrr=past[past.length-1].mrr;
+      futM.forEach((m,i)=>{ mrr=mrr*(1-churn)+newMRRbase*conv; d.push({m:m,mrr:Math.round(mrr),proj:Math.round(projBase[i]*conv),f:true}); });
+      return d;
+    }
+    const money=k=>'£'+Math.round(k)+'k';
+    function render(){
+      const conv=+convR.value/100, churn=+churnR.value/100;
+      document.getElementById('convVal').textContent=convR.value+'%';
+      document.getElementById('churnVal').textContent=churnR.value+'%';
+      const d=build(conv,churn);
+      const W=760,H=300,L=40,R=10,T=12,B=26, pw=W-L-R, ph=H-T-B;
+      let yMax=Math.max.apply(null,d.map(x=>x.mrr+x.proj)); yMax=Math.ceil(yMax/25)*25; if(yMax<75)yMax=75;
+      const pitch=pw/d.length, bw=Math.min(26,pitch*0.62);
+      const y=v=>T+ph*(1-v/yMax);
+      let s='';
+      for(let g=0;g<=yMax;g+=25){ s+='<line x1="'+L+'" y1="'+y(g)+'" x2="'+(W-R)+'" y2="'+y(g)+'" style="stroke:var(--line);stroke-width:1"/>'; s+='<text x="'+(L-6)+'" y="'+(y(g)+3)+'" text-anchor="end" style="fill:var(--faint);font-size:9px">'+g+'</text>'; }
+      d.forEach((x,i)=>{
+        const cx=L+pitch*i+pitch/2, x0=cx-bw/2;
+        const fstroke=x.f?';stroke:var(--line-2);stroke-dasharray:2 2':'', op=x.f?0.42:1;
+        const mh=ph*(x.mrr/yMax), pj=ph*(x.proj/yMax);
+        s+='<rect x="'+x0+'" y="'+y(x.mrr)+'" width="'+bw+'" height="'+mh+'" rx="1" style="fill:var(--accent);opacity:'+op+fstroke+'"/>';
+        s+='<rect x="'+x0+'" y="'+y(x.mrr+x.proj)+'" width="'+bw+'" height="'+pj+'" rx="1" style="fill:var(--teal);opacity:'+op+fstroke+'"/>';
+        s+='<text x="'+cx+'" y="'+(H-9)+'" text-anchor="middle" style="fill:var(--faint);font-size:8.5px">'+x.m+'</text>';
+      });
+      const nx=L+pitch*past.length;
+      s+='<line x1="'+nx+'" y1="'+T+'" x2="'+nx+'" y2="'+(T+ph)+'" style="stroke:var(--faint);stroke-width:1;stroke-dasharray:3 3"/>';
+      s+='<text x="'+(nx+4)+'" y="'+(T+10)+'" style="fill:var(--faint);font-size:9px">forecast →</text>';
+      chart.innerHTML=s;
+      const fut=d.filter(x=>x.f), sum=(a,n)=>a.slice(0,n).reduce((t,x)=>t+x.mrr+x.proj,0);
+      document.getElementById('kNext3').textContent=money(sum(fut,3));
+      document.getElementById('oNext3').textContent=money(sum(fut,3));
+      document.getElementById('oNext6').textContent=money(sum(fut,6));
+      document.getElementById('oNext12').textContent=money(sum(fut,12));
+      document.getElementById('oExitArr').textContent=money(fut[fut.length-1].mrr*12);
+    }
+    convR.addEventListener('input',render); churnR.addEventListener('input',render); render();
+  })();
+
+  // theme
+  const root=document.documentElement;
+  document.getElementById('themeToggle').addEventListener('click',()=>{const cur=root.getAttribute('data-theme'); const sysDark=window.matchMedia('(prefers-color-scheme:dark)').matches; root.setAttribute('data-theme', cur? (cur==='dark'?'light':'dark') : (sysDark?'light':'dark'));});
+</script>
